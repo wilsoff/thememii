@@ -1,0 +1,599 @@
+﻿/* This file is part of ThemeMii
+ * Copyright (C) 2009 Leathl
+ * 
+ * ThemeMii is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * ThemeMii is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+using System;
+using System.IO;
+using System.Threading;
+using System.Windows.Forms;
+
+namespace ThemeMii
+{
+    public partial class ThemeMii_Main : Form
+    {
+        public const string version = "0.1";
+        private mymini ini;
+        private string tempDir;
+        private string appOut;
+        private string mymOut;
+        private int lastSelected = -1;
+        private string lastSelectedEntry;
+        private bool ignoreMissing = false;
+        private bool sourceManage = false;
+        private bool containerManage = false;
+        private bool autoImageSize = false;
+        private BaseApp lastExtracted = (BaseApp)1;
+        private bool viewOnly = false;
+        private bool containerBrowse;
+        private string selectedNode;
+
+        public ThemeMii_Main()
+        {
+            InitializeComponent();
+            this.Icon = Properties.Resources.ThemeMii_Icon;
+            if (Properties.Settings.Default.firstRun) ShowDisclaimer();
+        }
+
+        private void ThemeMii_Main_Load(object sender, EventArgs e)
+        {
+            Thread updateThread = new Thread(new ThreadStart(this._updateCheck));
+            updateThread.Start();
+
+            this.Text = this.Text.Replace("X", version);
+            CenterToScreen();
+            Initialize();
+            LoadSettings();
+        }
+
+        private void ThemeMii_Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveSettings();
+
+            try
+            {
+                Directory.Delete(tempDir, true);
+            }
+            catch { }
+
+            Environment.Exit(0);
+        }
+
+        void ini_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        {
+            ReportProgress(e.ProgressPercentage, (string)e.UserState);
+        }
+
+        private void msOpen_Click(object sender, EventArgs e)
+        {
+            if (pbProgress.Value == 100)
+            {
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.Filter = "mym files|*.mym";
+
+                if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    Initialize();
+
+                    Thread workThread = new Thread(new ParameterizedThreadStart(this._loadMym));
+                    workThread.Start(ofd.FileName);
+                }
+            }
+        }
+
+        private void lbxIniEntrys_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SaveLastSelected();
+
+            if (lbxIniEntries.SelectedIndex > -1)
+            {
+                lastSelected = lbxIniEntries.SelectedIndex;
+                lastSelectedEntry = lbxIniEntries.Items[lbxIniEntries.SelectedIndex].ToString();
+                iniEntry tempEntry = ini.GetEntry(lbxIniEntries.SelectedItem.ToString());
+
+                if (tempEntry.entryType == iniEntry.EntryType.Container)
+                {
+                    lbCont.Text = tempEntry.entry;
+                    tbContainerFile.Text = tempEntry.file;
+                    cmbContainerFormat.SelectedIndex = (tempEntry.type == iniEntry.ContainerType.ASH) ? 0 : 1;
+
+                    if (!panContainer.Visible)
+                    {
+                        HidePanels();
+                        panContainer.Visible = true;
+                    }
+                }
+                else if (tempEntry.entryType == iniEntry.EntryType.CustomImage)
+                {
+                    lbCimg.Text = tempEntry.entry;
+                    tbCustomImageFile.Text = tempEntry.file;
+                    tbCustomImageName.Text = tempEntry.name;
+                    if (!autoImageSize) tbCustomImageWidth.Text = tempEntry.width.ToString();
+                    if (!autoImageSize) tbCustomImageHeight.Text = tempEntry.height.ToString();
+                    cmbCustomImageFormat.SelectedIndex = (tempEntry.format == iniEntry.TplFormat.RGB5A3) ? 0 : (tempEntry.format == iniEntry.TplFormat.RGBA8) ? 1 : 2;
+
+                    if (!panCustomImage.Visible)
+                    {
+                        HidePanels();
+                        panCustomImage.Visible = true;
+                    }
+                }
+                else if (tempEntry.entryType == iniEntry.EntryType.StaticImage)
+                {
+                    lbSimg.Text = tempEntry.entry;
+                    tbStaticImageFile.Text = tempEntry.file;
+                    if (!sourceManage) tbStaticImageSource.Text = tempEntry.source;
+                    if (!autoImageSize) tbStaticImageWidth.Text = tempEntry.width.ToString();
+                    if (!autoImageSize) tbStaticImageHeight.Text = tempEntry.height.ToString();
+                    cmbStaticImageFormat.SelectedIndex = (tempEntry.format == iniEntry.TplFormat.RGB5A3) ? 0 : (tempEntry.format == iniEntry.TplFormat.RGBA8) ? 1 : 2;
+
+                    tbStaticImageFilepath.Text = tempEntry.filepath;
+
+                    if (!panStaticImage.Visible)
+                    {
+                        HidePanels();
+                        panStaticImage.Visible = true;
+                    }
+                }
+                else if (tempEntry.entryType == iniEntry.EntryType.CustomData)
+                {
+                    lbCdta.Text = tempEntry.entry;
+                    tbCustomDataFile.Text = tempEntry.file;
+                    tbCustomDataName.Text = tempEntry.name;
+
+                    if (!panCustomData.Visible)
+                    {
+                        HidePanels();
+                        panCustomData.Visible = true;
+                    }
+                }
+                else if (tempEntry.entryType == iniEntry.EntryType.StaticData)
+                {
+                    lbSdta.Text = tempEntry.entry;
+                    tbStaticDataFile.Text = tempEntry.file;
+                    if (!sourceManage) tbStaticDataSource.Text = tempEntry.source;
+
+                    tbStaticDataFilepath.Text = tempEntry.filepath;
+
+                    if (!panStaticData.Visible)
+                    {
+                        HidePanels();
+                        panStaticData.Visible = true;
+                    }
+                }
+            }
+            else HidePanels();
+        }
+
+        private void msExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void msNew_Click(object sender, EventArgs e)
+        {
+            if (pbProgress.Value == 100)
+            {
+                Initialize();
+                SetControls(true);
+                ini = new mymini();
+            }
+        }
+
+        private void msSave_Click(object sender, EventArgs e)
+        {
+            if (pbProgress.Value == 100)
+                SaveMym();
+        }
+
+        private void intTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = !char.IsDigit(e.KeyChar) && e.KeyChar != '\b';
+        }
+
+        private void SwapEntryUp(object sender, EventArgs e)
+        {
+            SwapEntries(lbxIniEntries.SelectedIndex, true);
+        }
+
+        private void SwapEntryDown(object sender, EventArgs e)
+        {
+            SwapEntries(lbxIniEntries.SelectedIndex, false);
+        }
+
+        private void msMoveStart_Click(object sender, EventArgs e)
+        {
+            if (lbxIniEntries.SelectedIndex > -1)
+            {
+                SaveSelected();
+                object temp = lbxIniEntries.Items[lbxIniEntries.SelectedIndex];
+                lbxIniEntries.Items.RemoveAt(lbxIniEntries.SelectedIndex);
+                lbxIniEntries.Items.Insert(0, temp);
+                lbxIniEntries.SelectedIndex = 0;
+            }
+        }
+
+        private void msMoveEnd_Click(object sender, EventArgs e)
+        {
+            if (lbxIniEntries.SelectedIndex > -1)
+            {
+                SaveSelected();
+                object temp = lbxIniEntries.Items[lbxIniEntries.SelectedIndex];
+                lbxIniEntries.Items.RemoveAt(lbxIniEntries.SelectedIndex);
+                lbxIniEntries.Items.Add(temp);
+                lbxIniEntries.SelectedIndex = lbxIniEntries.Items.Count - 1;
+            }
+        }
+
+        private void btnMinus_Click(object sender, EventArgs e)
+        {
+            RemoveEntry(lbxIniEntries.SelectedIndex);
+        }
+
+        private void btnPlus_Click(object sender, EventArgs e)
+        {
+            cmAdd.Show(MousePosition);
+        }
+
+        private void msAddContainer_Click(object sender, EventArgs e)
+        {
+            AddEntry(iniEntry.EntryType.Container);
+        }
+
+        private void msAddStaticImage_Click(object sender, EventArgs e)
+        {
+            AddEntry(iniEntry.EntryType.StaticImage);
+        }
+
+        private void msAddStaticData_Click(object sender, EventArgs e)
+        {
+            AddEntry(iniEntry.EntryType.StaticData);
+        }
+
+        private void msAddCustomImage_Click(object sender, EventArgs e)
+        {
+            AddEntry(iniEntry.EntryType.CustomImage);
+        }
+
+        private void msAddCustomData_Click(object sender, EventArgs e)
+        {
+            AddEntry(iniEntry.EntryType.CustomData);
+        }
+
+        private void btnStaticDataBrowse_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (File.Exists(tbStaticDataFilepath.Text)) ofd.InitialDirectory = Path.GetDirectoryName(tbStaticDataFilepath.Text);
+
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                tbStaticDataFilepath.Text = ofd.FileName;
+            }
+        }
+
+        private void btnStaticImageBrowse_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "PNG|*.png";
+            if (File.Exists(tbStaticImageFilepath.Text)) ofd.InitialDirectory = Path.GetDirectoryName(tbStaticImageFilepath.Text);
+
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                tbStaticImageFilepath.Text = ofd.FileName;
+            }
+        }
+
+        private void msRemoveMissingStatics_Click(object sender, EventArgs e)
+        {
+            for (int i = lbxIniEntries.Items.Count - 1; i > -1; i--)
+            {
+                if (lbxIniEntries.Items[i].ToString().StartsWith("[s"))
+                {
+                    iniEntry tempEntry = ini.GetEntry(lbxIniEntries.Items[i].ToString());
+                    if (!File.Exists(tempEntry.filepath))
+                        RemoveEntry(i);
+                }
+            }
+        }
+
+        private void msIgnoreMissingEntries_Click(object sender, EventArgs e)
+        {
+            ignoreMissing = msIgnoreMissingEntries.Checked;
+        }
+
+        private void msAutoManage_Click(object sender, EventArgs e)
+        {
+            if (!msSourceManage.Checked)
+            {
+                sourceManage = false;
+
+                if (panStaticImage.Visible)
+                { tbStaticImageSource.Text = ini.GetEntry(lbxIniEntries.SelectedItem.ToString()).source; }
+                else if (panStaticData.Visible)
+                { tbStaticDataSource.Text = ini.GetEntry(lbxIniEntries.SelectedItem.ToString()).source; }
+
+                tbStaticDataSource.Enabled = true;
+                tbStaticImageSource.Enabled = true;
+            }
+            else
+            {
+                sourceManage = true;
+                tbStaticDataSource.Text = string.Empty;
+                tbStaticImageSource.Text = string.Empty;
+                tbStaticDataSource.Enabled = false;
+                tbStaticImageSource.Enabled = false;
+            }
+        }
+
+        private void msImageSizeFromPng_Click(object sender, EventArgs e)
+        {
+            if (!msImageSizeFromPng.Checked)
+            {
+                autoImageSize = false;
+
+                if (panStaticImage.Visible)
+                {
+                    iniEntry tempEntry = ini.GetEntry(lbxIniEntries.SelectedItem.ToString());
+                    tbStaticImageWidth.Text = tempEntry.width.ToString();
+                    tbStaticImageHeight.Text = tempEntry.height.ToString();
+                }
+                else if (panCustomImage.Visible)
+                {
+                    iniEntry tempEntry = ini.GetEntry(lbxIniEntries.SelectedItem.ToString());
+                    tbCustomImageWidth.Text = tempEntry.width.ToString();
+                    tbCustomImageHeight.Text = tempEntry.height.ToString();
+                }
+
+                tbStaticImageWidth.Enabled = true;
+                tbStaticImageHeight.Enabled = true;
+                tbCustomImageWidth.Enabled = true;
+                tbCustomImageHeight.Enabled = true;
+            }
+            else
+            {
+                autoImageSize = true;
+                tbStaticImageWidth.Text = string.Empty;
+                tbStaticImageHeight.Text = string.Empty;
+                tbCustomImageWidth.Text = string.Empty;
+                tbCustomImageHeight.Text = string.Empty;
+                tbStaticImageWidth.Enabled = false;
+                tbStaticImageHeight.Enabled = false;
+                tbCustomImageWidth.Enabled = false;
+                tbCustomImageHeight.Enabled = false;
+
+                MessageBox.Show("Be sure that your PNG images have the same size as the original TPLs they will replace," +
+                                " else you might get a brick!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void StandardSysMenu_Click(object sender, EventArgs e)
+        {
+            bool state = ((ToolStripMenuItem)sender).Checked;
+
+            if (state)
+            {
+                UncheckSysMenus();
+
+                ToolStripMenuItem cmSender = sender as ToolStripMenuItem;
+                BaseApp bApp;
+                string titleVersion;
+
+                switch (cmSender.Name)
+                {
+                    case "ms32J":
+                        bApp = BaseApp.J32;
+                        titleVersion = "288";
+                        break;
+                    case "ms32U":
+                        bApp = BaseApp.U32;
+                        titleVersion = "289";
+                        break;
+                    case "ms32E":
+                        bApp = BaseApp.E32;
+                        titleVersion = "290";
+                        break;
+                    case "ms40J":
+                        bApp = BaseApp.J40;
+                        titleVersion = "416";
+                        break;
+                    case "ms40U":
+                        bApp = BaseApp.U40;
+                        titleVersion = "417";
+                        break;
+                    case "ms40E":
+                        bApp = BaseApp.E40;
+                        titleVersion = "418";
+                        break;
+                    case "ms41J":
+                        bApp = BaseApp.J41;
+                        titleVersion = "448";
+                        break;
+                    case "ms41U":
+                        bApp = BaseApp.U41;
+                        titleVersion = "449";
+                        break;
+                    case "ms41E":
+                        bApp = BaseApp.E41;
+                        titleVersion = "450";
+                        break;
+                    case "ms42J":
+                        bApp = BaseApp.J42;
+                        titleVersion = "480";
+                        break;
+                    case "ms42U":
+                        bApp = BaseApp.U42;
+                        titleVersion = "481";
+                        break;
+                    case "ms42E":
+                        bApp = BaseApp.E42;
+                        titleVersion = "482";
+                        break;
+                    default: return;
+                }
+
+                if (!File.Exists(Application.StartupPath + "\\" + ((int)bApp).ToString("x8") + ".app"))
+                {
+                    if (MessageBox.Show(string.Format("{0}.app wasn't found in the application directory.\nDo you want to download it?", ((int)bApp).ToString("x8")),
+                        "Download Base App?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != System.Windows.Forms.DialogResult.Yes) return;
+                    
+                    Thread workerThread = new Thread(new ParameterizedThreadStart(this._downloadBaseApp));
+                    workerThread.Start(new string[] { ((int)bApp).ToString("x8"), titleVersion,  Application.StartupPath + "\\" + ((int)bApp).ToString("x8") + ".app" });
+                }
+
+                ((ToolStripMenuItem)sender).Checked = state;
+            }
+        }
+
+        private void btnCreateCsm_Click(object sender, EventArgs e)
+        {
+            if (lbxIniEntries.Items.Count > 0 && pbProgress.Value == 100)
+            {
+                BaseApp bApp = GetBaseApp();
+                string baseApp = Application.StartupPath + "\\" + ((int)bApp).ToString("x8") + ".app";
+                if (!File.Exists(baseApp) || (int)bApp == 0)
+                {
+                    OpenFileDialog ofd = new OpenFileDialog();
+                    if ((int)bApp > 0) ofd.Title = "Standard System Menu base app wasn't found";
+                    ofd.Filter = "app|*.app";
+
+                    if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK) baseApp = ofd.FileName;
+                    else return;
+                }
+
+                CreateCsm(baseApp);
+            }
+        }
+
+        private void msAbout_Click(object sender, EventArgs e)
+        {
+            ThemeMii_About aboutWindow = new ThemeMii_About();
+            aboutWindow.ShowDialog();
+        }
+
+        private void DownloadBaseApp_Click(object sender, EventArgs e)
+        {
+            if (pbProgress.Value < 100) return;
+            if (!CommonKeyCheck()) return;
+
+            ToolStripMenuItem cmSender = sender as ToolStripMenuItem;
+            string titleVersion;
+            BaseApp bApp = new BaseApp();
+
+            switch (cmSender.Name)
+            {
+                case "msDownload32J":
+                    bApp = BaseApp.J32;
+                    titleVersion = "288";
+                    break;
+                case "msDownload32U":
+                    bApp = BaseApp.U32;
+                    titleVersion = "289";
+                    break;
+                case "msDownload32E":
+                    bApp = BaseApp.E32;
+                    titleVersion = "290";
+                    break;
+                case "msDownload40J":
+                    bApp = BaseApp.J40;
+                    titleVersion = "416";
+                    break;
+                case "msDownload40U":
+                    bApp = BaseApp.U40;
+                    titleVersion = "417";
+                    break;
+                case "msDownload40E":
+                    bApp = BaseApp.E40;
+                    titleVersion = "418";
+                    break;
+                case "msDownload41J":
+                    bApp = BaseApp.J41;
+                    titleVersion = "448";
+                    break;
+                case "msDownload41U":
+                    bApp = BaseApp.U41;
+                    titleVersion = "449";
+                    break;
+                case "msDownload41E":
+                    bApp = BaseApp.E41;
+                    titleVersion = "450";
+                    break;
+                case "msDownload42J":
+                    bApp = BaseApp.J42;
+                    titleVersion = "480";
+                    break;
+                case "msDownload42U":
+                    bApp = BaseApp.U42;
+                    titleVersion = "481";
+                    break;
+                case "msDownload42E":
+                    bApp = BaseApp.E42;
+                    titleVersion = "482";
+                    break;
+                default: return;
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "app|*.app";
+            sfd.FileName = ((int)bApp).ToString("x8");
+
+            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                Thread workerThread = new Thread(new ParameterizedThreadStart(this._downloadBaseApp));
+                workerThread.Start(new string[] { ((int)bApp).ToString("x8"), titleVersion, sfd.FileName });
+            }
+        }
+
+        private void btnCsmToMym_Click(object sender, EventArgs e)
+        {
+            if (pbProgress.Value == 100)
+            {
+                ThemeMii_CsmToMym ctm = new ThemeMii_CsmToMym();
+                ctm.tempDir = tempDir + "compare";
+
+                ctm.ShowDialog();
+            }
+        }
+
+        private void btnBrowseFile_Click(object sender, EventArgs e)
+        {
+            if (pbProgress.Value == 100)
+            {
+                if (sender == msBrowseBaseApp) viewOnly = true;
+                else viewOnly = false;
+
+                if (sender == btnContainerBrowseFile) containerBrowse = true;
+                else containerBrowse = false;
+
+                if (sender != msBrowseBaseApp)
+                {
+                    if (panContainer.Visible) selectedNode = tbContainerFile.Text;
+                    else if (panCustomImage.Visible) selectedNode = tbCustomImageFile.Text;
+                    else if (panCustomData.Visible) selectedNode = tbCustomDataFile.Text;
+                    else if (panStaticImage.Visible) selectedNode = tbStaticImageFile.Text;
+                    else if (panStaticData.Visible) selectedNode = tbStaticDataFile.Text;
+                    else selectedNode = string.Empty;
+                }
+                else selectedNode = string.Empty;
+
+                AppBrowse();
+            }
+        }
+
+        private void msContainerManage_Click(object sender, EventArgs e)
+        {
+            containerManage = msContainerManage.Checked;
+        }
+    }
+}
