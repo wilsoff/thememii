@@ -24,21 +24,17 @@ namespace ThemeMii
 {
     public partial class ThemeMii_Main : Form
     {
-        public const string version = "0.1";
+        public const string version = "0.2";
         private mymini ini;
         private string tempDir;
         private string appOut;
         private string mymOut;
         private int lastSelected = -1;
         private string lastSelectedEntry;
-        private bool ignoreMissing = false;
-        private bool sourceManage = false;
-        private bool containerManage = false;
-        private bool autoImageSize = false;
+        private ThemeMiiSettings settings;
         private BaseApp lastExtracted = (BaseApp)1;
-        private bool viewOnly = false;
-        private bool containerBrowse;
-        private string selectedNode;
+        private AppBrowseInfo browseInfo;
+        private string openedMym;
 
         public ThemeMii_Main()
         {
@@ -60,6 +56,21 @@ namespace ThemeMii
 
         private void ThemeMii_Main_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (btnCreateCsm.Enabled && settings.savePrompt)
+            {
+                DialogResult dlg = MessageBox.Show("Do you want to save your mym before closing?",
+                    "Save?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                
+                if (dlg == System.Windows.Forms.DialogResult.Yes)
+                {
+                    SaveMym(true);
+
+                    e.Cancel = true;
+                    return;
+                }
+                else if (dlg == System.Windows.Forms.DialogResult.Cancel) { e.Cancel = true; return; }
+            }
+
             SaveSettings();
 
             try
@@ -120,9 +131,16 @@ namespace ThemeMii
                     lbCimg.Text = tempEntry.entry;
                     tbCustomImageFile.Text = tempEntry.file;
                     tbCustomImageName.Text = tempEntry.name;
-                    if (!autoImageSize) tbCustomImageWidth.Text = tempEntry.width.ToString();
-                    if (!autoImageSize) tbCustomImageHeight.Text = tempEntry.height.ToString();
-                    cmbCustomImageFormat.SelectedIndex = (tempEntry.format == iniEntry.TplFormat.RGB5A3) ? 0 : (tempEntry.format == iniEntry.TplFormat.RGBA8) ? 1 : 2;
+                    if (!settings.autoImageSize) tbCustomImageWidth.Text = tempEntry.width.ToString();
+                    if (!settings.autoImageSize) tbCustomImageHeight.Text = tempEntry.height.ToString();
+
+                    if (tempEntry.format == iniEntry.TplFormat.RGB5A3) cmbCustomImageFormat.SelectedIndex = 0;
+                    else if (tempEntry.format == iniEntry.TplFormat.RGBA8) cmbCustomImageFormat.SelectedIndex = 1;
+                    else if (tempEntry.format == iniEntry.TplFormat.RGB565) cmbCustomImageFormat.SelectedIndex = 2;
+                    else if (tempEntry.format == iniEntry.TplFormat.I4) cmbCustomImageFormat.SelectedIndex = 3;
+                    else if (tempEntry.format == iniEntry.TplFormat.I8) cmbCustomImageFormat.SelectedIndex = 4;
+                    else if (tempEntry.format == iniEntry.TplFormat.IA4) cmbCustomImageFormat.SelectedIndex = 5;
+                    else if (tempEntry.format == iniEntry.TplFormat.IA8) cmbCustomImageFormat.SelectedIndex = 6;
 
                     if (!panCustomImage.Visible)
                     {
@@ -134,11 +152,17 @@ namespace ThemeMii
                 {
                     lbSimg.Text = tempEntry.entry;
                     tbStaticImageFile.Text = tempEntry.file;
-                    if (!sourceManage) tbStaticImageSource.Text = tempEntry.source;
-                    if (!autoImageSize) tbStaticImageWidth.Text = tempEntry.width.ToString();
-                    if (!autoImageSize) tbStaticImageHeight.Text = tempEntry.height.ToString();
-                    cmbStaticImageFormat.SelectedIndex = (tempEntry.format == iniEntry.TplFormat.RGB5A3) ? 0 : (tempEntry.format == iniEntry.TplFormat.RGBA8) ? 1 : 2;
+                    if (!settings.sourceManage) tbStaticImageSource.Text = tempEntry.source;
+                    if (!settings.autoImageSize) tbStaticImageWidth.Text = tempEntry.width.ToString();
+                    if (!settings.autoImageSize) tbStaticImageHeight.Text = tempEntry.height.ToString();
 
+                    if (tempEntry.format == iniEntry.TplFormat.RGB5A3) cmbStaticImageFormat.SelectedIndex = 0;
+                    else if (tempEntry.format == iniEntry.TplFormat.RGBA8) cmbStaticImageFormat.SelectedIndex = 1;
+                    else if (tempEntry.format == iniEntry.TplFormat.RGB565) cmbStaticImageFormat.SelectedIndex = 2;
+                    else if (tempEntry.format == iniEntry.TplFormat.I4) cmbStaticImageFormat.SelectedIndex = 3;
+                    else if (tempEntry.format == iniEntry.TplFormat.I8) cmbStaticImageFormat.SelectedIndex = 4;
+                    else if (tempEntry.format == iniEntry.TplFormat.IA4) cmbStaticImageFormat.SelectedIndex = 5;
+                    else if (tempEntry.format == iniEntry.TplFormat.IA8) cmbStaticImageFormat.SelectedIndex = 6;
                     tbStaticImageFilepath.Text = tempEntry.filepath;
 
                     if (!panStaticImage.Visible)
@@ -163,7 +187,7 @@ namespace ThemeMii
                 {
                     lbSdta.Text = tempEntry.entry;
                     tbStaticDataFile.Text = tempEntry.file;
-                    if (!sourceManage) tbStaticDataSource.Text = tempEntry.source;
+                    if (!settings.sourceManage) tbStaticDataSource.Text = tempEntry.source;
 
                     tbStaticDataFilepath.Text = tempEntry.filepath;
 
@@ -189,13 +213,14 @@ namespace ThemeMii
                 Initialize();
                 SetControls(true);
                 ini = new mymini();
+                openedMym = string.Empty;
             }
         }
 
         private void msSave_Click(object sender, EventArgs e)
         {
             if (pbProgress.Value == 100)
-                SaveMym();
+                SaveMym(false);
         }
 
         private void intTextBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -310,14 +335,14 @@ namespace ThemeMii
 
         private void msIgnoreMissingEntries_Click(object sender, EventArgs e)
         {
-            ignoreMissing = msIgnoreMissingEntries.Checked;
+            settings.ignoreMissing = msIgnoreMissingEntries.Checked;
         }
 
         private void msAutoManage_Click(object sender, EventArgs e)
         {
             if (!msSourceManage.Checked)
             {
-                sourceManage = false;
+                settings.sourceManage = false;
 
                 if (panStaticImage.Visible)
                 { tbStaticImageSource.Text = ini.GetEntry(lbxIniEntries.SelectedItem.ToString()).source; }
@@ -329,7 +354,7 @@ namespace ThemeMii
             }
             else
             {
-                sourceManage = true;
+                settings.sourceManage = true;
                 tbStaticDataSource.Text = string.Empty;
                 tbStaticImageSource.Text = string.Empty;
                 tbStaticDataSource.Enabled = false;
@@ -341,7 +366,7 @@ namespace ThemeMii
         {
             if (!msImageSizeFromPng.Checked)
             {
-                autoImageSize = false;
+                settings.autoImageSize = false;
 
                 if (panStaticImage.Visible)
                 {
@@ -363,7 +388,7 @@ namespace ThemeMii
             }
             else
             {
-                autoImageSize = true;
+                settings.autoImageSize = true;
                 tbStaticImageWidth.Text = string.Empty;
                 tbStaticImageHeight.Text = string.Empty;
                 tbCustomImageWidth.Text = string.Empty;
@@ -447,9 +472,12 @@ namespace ThemeMii
                 {
                     if (MessageBox.Show(string.Format("{0}.app wasn't found in the application directory.\nDo you want to download it?", ((int)bApp).ToString("x8")),
                         "Download Base App?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != System.Windows.Forms.DialogResult.Yes) return;
-                    
-                    Thread workerThread = new Thread(new ParameterizedThreadStart(this._downloadBaseApp));
-                    workerThread.Start(new string[] { ((int)bApp).ToString("x8"), titleVersion,  Application.StartupPath + "\\" + ((int)bApp).ToString("x8") + ".app" });
+
+                    if (CommonKeyCheck())
+                    {
+                        Thread workerThread = new Thread(new ParameterizedThreadStart(this._downloadBaseApp));
+                        workerThread.Start(new string[] { ((int)bApp).ToString("x8"), titleVersion, Application.StartupPath + "\\" + ((int)bApp).ToString("x8") + ".app" });
+                    }
                 }
 
                 ((ToolStripMenuItem)sender).Checked = state;
@@ -472,7 +500,7 @@ namespace ThemeMii
                     else return;
                 }
 
-                CreateCsm(baseApp);
+                CreateCsm(baseApp, string.Empty);
             }
         }
 
@@ -555,7 +583,7 @@ namespace ThemeMii
             }
         }
 
-        private void btnCsmToMym_Click(object sender, EventArgs e)
+        private void msCsmToMym_Click(object sender, EventArgs e)
         {
             if (pbProgress.Value == 100)
             {
@@ -570,22 +598,25 @@ namespace ThemeMii
         {
             if (pbProgress.Value == 100)
             {
-                if (sender == msBrowseBaseApp) viewOnly = true;
-                else viewOnly = false;
+                if (sender == msBrowseBaseApp) browseInfo.viewOnly = true;
+                else browseInfo.viewOnly = false;
 
-                if (sender == btnContainerBrowseFile) containerBrowse = true;
-                else containerBrowse = false;
+                if (sender == btnContainerBrowseFile) browseInfo.containerBrowse = true;
+                else browseInfo.containerBrowse = false;
 
                 if (sender != msBrowseBaseApp)
                 {
-                    if (panContainer.Visible) selectedNode = tbContainerFile.Text;
-                    else if (panCustomImage.Visible) selectedNode = tbCustomImageFile.Text;
-                    else if (panCustomData.Visible) selectedNode = tbCustomDataFile.Text;
-                    else if (panStaticImage.Visible) selectedNode = tbStaticImageFile.Text;
-                    else if (panStaticData.Visible) selectedNode = tbStaticDataFile.Text;
-                    else selectedNode = string.Empty;
+                    if (panContainer.Visible) browseInfo.selectedNode = tbContainerFile.Text;
+                    else if (panCustomImage.Visible) browseInfo.selectedNode = tbCustomImageFile.Text;
+                    else if (panCustomData.Visible) browseInfo.selectedNode = tbCustomDataFile.Text;
+                    else if (panStaticImage.Visible) browseInfo.selectedNode = tbStaticImageFile.Text;
+                    else if (panStaticData.Visible) browseInfo.selectedNode = tbStaticDataFile.Text;
+                    else browseInfo.selectedNode = string.Empty;
+
+                    if (panStaticImage.Visible || panCustomImage.Visible) browseInfo.onlyTpls = true;
+                    else browseInfo.onlyTpls = false;
                 }
-                else selectedNode = string.Empty;
+                else browseInfo.selectedNode = string.Empty;
 
                 AppBrowse();
             }
@@ -593,7 +624,59 @@ namespace ThemeMii
 
         private void msContainerManage_Click(object sender, EventArgs e)
         {
-            containerManage = msContainerManage.Checked;
+            settings.containerManage = msContainerManage.Checked;
+        }
+
+        private void msKeepExtractedApp_Click(object sender, EventArgs e)
+        {
+            settings.keepExtractedApp = msKeepExtractedApp.Checked;
+        }
+
+        private void msLz77Containers_Click(object sender, EventArgs e)
+        {
+            settings.lz77Containers = msLz77Containers.Checked;
+        }
+
+        private void msHelp_Click(object sender, EventArgs e)
+        {
+            ThemeMii_Help help = new ThemeMii_Help();
+            help.ShowDialog();
+        }
+
+        private void msInstallToNandBackup_Click(object sender, EventArgs e)
+        {
+            if (lbxIniEntries.Items.Count > 0 && pbProgress.Value == 100)
+            {
+                FolderBrowserDialog fbd = new FolderBrowserDialog();
+                fbd.Description = "Choose the drive or directory where the 8 folders of the NAND backup are (ticket, title, shared1, ...)";
+
+                if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    string sysMenuPath = fbd.SelectedPath + "\\title\\00000001\\00000002\\content\\";
+
+                    if (!Directory.Exists(sysMenuPath))
+                    { ErrorBox("Directory wasn't found:\n" + sysMenuPath); return; }
+                    if (!File.Exists(sysMenuPath + "title.tmd"))
+                    { ErrorBox("File wasn't found:\n" + sysMenuPath + "title.tmd"); return; }
+
+                    BaseApp bApp = GetBaseAppFromTitleVersion(Wii.WadInfo.GetTitleVersion(sysMenuPath + "title.tmd"));
+
+                    if ((int)bApp == 0)
+                    { ErrorBox("Incompatible System Menu found. You must either have 3.2, 4.0, 4.1 or 4.2 (J/U/E)!"); return; }
+
+                    string baseAppFile = sysMenuPath + ((int)bApp).ToString("x8") + ".app";
+
+                    if (!File.Exists(baseAppFile))
+                    { ErrorBox("Base app file wasn't found:\n" + baseAppFile); return; }
+
+                    CreateCsm(baseAppFile, baseAppFile);
+                }
+            }
+        }
+
+        private void msSavePrompt_Click(object sender, EventArgs e)
+        {
+            settings.savePrompt = msSavePrompt.Checked;
         }
     }
 }

@@ -9,6 +9,20 @@ Please report bugs and make suggestions at the issue tracker there.
 Changelog:
 ----------
 
+Version 0.2
+	- Made the window resizable
+	- Added some basic instructions "? -> Help"
+	- Added ability to install a theme directly to a nand backup (Tools menu)
+	- Added option to Lz77 compress containers for smaller csm's (enabled by default!)
+	- Added option to keep the extracted base app (enabled by default!)
+	- Added save prompt when closing application (can be turned off)
+	- Added I4, I8, IA4 and IA8 as TPL formats (not compatible with MyMenu!!!)
+	- Fixed TPL formats (all images were RGB5A3 before, didn't matter what you selected)
+	- Fixed a bug when downloading base app
+	- Fixed previewing of Lz77 compressed non-tpl images (base app browsing)
+	- csm to mym: Fixed errors with Yaz0 compressed files
+	- csm to mym: Fixed forgotten containers in mym.ini
+
 Version 0.1
 	- Initial Release
 

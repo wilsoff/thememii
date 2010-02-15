@@ -54,6 +54,7 @@ namespace ThemeMii
             this.tbContainerFile = new System.Windows.Forms.TextBox();
             this.lbContainerFile = new System.Windows.Forms.Label();
             this.panCustomImage = new System.Windows.Forms.Panel();
+            this.btnCustomImageBrowseFile = new System.Windows.Forms.Button();
             this.cmbCustomImageFormat = new System.Windows.Forms.ComboBox();
             this.lbCimg = new System.Windows.Forms.Label();
             this.tbCustomImageHeight = new System.Windows.Forms.TextBox();
@@ -109,6 +110,10 @@ namespace ThemeMii
             this.msContainerManage = new System.Windows.Forms.ToolStripMenuItem();
             this.msImageSizeFromPng = new System.Windows.Forms.ToolStripMenuItem();
             this.msIgnoreMissingEntries = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.msLz77Containers = new System.Windows.Forms.ToolStripMenuItem();
+            this.msKeepExtractedApp = new System.Windows.Forms.ToolStripMenuItem();
+            this.msSavePrompt = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.msStandardSysMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.ms32 = new System.Windows.Forms.ToolStripMenuItem();
@@ -128,8 +133,9 @@ namespace ThemeMii
             this.ms42U = new System.Windows.Forms.ToolStripMenuItem();
             this.ms42E = new System.Windows.Forms.ToolStripMenuItem();
             this.msTools = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnCsmToMym = new System.Windows.Forms.ToolStripMenuItem();
+            this.msCsmToMym = new System.Windows.Forms.ToolStripMenuItem();
             this.msBrowseBaseApp = new System.Windows.Forms.ToolStripMenuItem();
+            this.msInstallToNandBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.msDownloadBaseApp = new System.Windows.Forms.ToolStripMenuItem();
             this.msDownload32 = new System.Windows.Forms.ToolStripMenuItem();
@@ -149,10 +155,13 @@ namespace ThemeMii
             this.msDownload42U = new System.Windows.Forms.ToolStripMenuItem();
             this.msDownload42E = new System.Windows.Forms.ToolStripMenuItem();
             this.msQuestion = new System.Windows.Forms.ToolStripMenuItem();
+            this.msHelp = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.msAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.btnMinus = new System.Windows.Forms.Button();
             this.btnPlus = new System.Windows.Forms.Button();
             this.panCustomData = new System.Windows.Forms.Panel();
+            this.btnCustomDataBrowseFile = new System.Windows.Forms.Button();
             this.lbCdta = new System.Windows.Forms.Label();
             this.tbCustomDataName = new System.Windows.Forms.TextBox();
             this.lbCustomDataName = new System.Windows.Forms.Label();
@@ -180,8 +189,10 @@ namespace ThemeMii
             this.cmAddStaticData = new System.Windows.Forms.ToolStripMenuItem();
             this.cmAddCustomImage = new System.Windows.Forms.ToolStripMenuItem();
             this.cmAddCustomData = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnCustomImageBrowseFile = new System.Windows.Forms.Button();
-            this.btnCustomDataBrowseFile = new System.Windows.Forms.Button();
+            this.panList = new System.Windows.Forms.Panel();
+            this.panButtons = new System.Windows.Forms.Panel();
+            this.panPanels = new System.Windows.Forms.Panel();
+            this.lbContainerInfo = new System.Windows.Forms.Label();
             this.panContainer.SuspendLayout();
             this.panCustomImage.SuspendLayout();
             this.panStaticImage.SuspendLayout();
@@ -190,12 +201,17 @@ namespace ThemeMii
             this.panStaticData.SuspendLayout();
             this.ssStatus.SuspendLayout();
             this.cmAdd.SuspendLayout();
+            this.panList.SuspendLayout();
+            this.panButtons.SuspendLayout();
+            this.panPanels.SuspendLayout();
             this.SuspendLayout();
             // 
             // lbxIniEntries
             // 
+            this.lbxIniEntries.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.lbxIniEntries.FormattingEnabled = true;
-            this.lbxIniEntries.Location = new System.Drawing.Point(12, 29);
+            this.lbxIniEntries.Location = new System.Drawing.Point(8, 6);
             this.lbxIniEntries.Name = "lbxIniEntries";
             this.lbxIniEntries.Size = new System.Drawing.Size(127, 277);
             this.lbxIniEntries.TabIndex = 0;
@@ -203,14 +219,18 @@ namespace ThemeMii
             // 
             // panContainer
             // 
+            this.panContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.panContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panContainer.Controls.Add(this.lbContainerInfo);
             this.panContainer.Controls.Add(this.btnContainerBrowseFile);
             this.panContainer.Controls.Add(this.lbCont);
             this.panContainer.Controls.Add(this.cmbContainerFormat);
             this.panContainer.Controls.Add(this.lbContainerType);
             this.panContainer.Controls.Add(this.tbContainerFile);
             this.panContainer.Controls.Add(this.lbContainerFile);
-            this.panContainer.Location = new System.Drawing.Point(145, 29);
+            this.panContainer.Location = new System.Drawing.Point(8, 6);
             this.panContainer.Name = "panContainer";
             this.panContainer.Size = new System.Drawing.Size(224, 303);
             this.panContainer.TabIndex = 1;
@@ -218,6 +238,7 @@ namespace ThemeMii
             // 
             // btnContainerBrowseFile
             // 
+            this.btnContainerBrowseFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnContainerBrowseFile.Location = new System.Drawing.Point(181, 44);
             this.btnContainerBrowseFile.Name = "btnContainerBrowseFile";
             this.btnContainerBrowseFile.Size = new System.Drawing.Size(21, 20);
@@ -228,6 +249,8 @@ namespace ThemeMii
             // 
             // lbCont
             // 
+            this.lbCont.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lbCont.Location = new System.Drawing.Point(0, 16);
             this.lbCont.Name = "lbCont";
             this.lbCont.Size = new System.Drawing.Size(224, 13);
@@ -237,14 +260,16 @@ namespace ThemeMii
             // 
             // cmbContainerFormat
             // 
+            this.cmbContainerFormat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbContainerFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbContainerFormat.FormattingEnabled = true;
             this.cmbContainerFormat.Items.AddRange(new object[] {
             "ASH|U8",
             "U8"});
-            this.cmbContainerFormat.Location = new System.Drawing.Point(45, 75);
+            this.cmbContainerFormat.Location = new System.Drawing.Point(53, 75);
             this.cmbContainerFormat.Name = "cmbContainerFormat";
-            this.cmbContainerFormat.Size = new System.Drawing.Size(157, 21);
+            this.cmbContainerFormat.Size = new System.Drawing.Size(149, 21);
             this.cmbContainerFormat.TabIndex = 3;
             // 
             // lbContainerType
@@ -258,9 +283,11 @@ namespace ThemeMii
             // 
             // tbContainerFile
             // 
-            this.tbContainerFile.Location = new System.Drawing.Point(45, 44);
+            this.tbContainerFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbContainerFile.Location = new System.Drawing.Point(53, 44);
             this.tbContainerFile.Name = "tbContainerFile";
-            this.tbContainerFile.Size = new System.Drawing.Size(130, 20);
+            this.tbContainerFile.Size = new System.Drawing.Size(122, 20);
             this.tbContainerFile.TabIndex = 1;
             // 
             // lbContainerFile
@@ -274,6 +301,9 @@ namespace ThemeMii
             // 
             // panCustomImage
             // 
+            this.panCustomImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.panCustomImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panCustomImage.Controls.Add(this.btnCustomImageBrowseFile);
             this.panCustomImage.Controls.Add(this.cmbCustomImageFormat);
@@ -287,20 +317,37 @@ namespace ThemeMii
             this.panCustomImage.Controls.Add(this.lbCustomImageName);
             this.panCustomImage.Controls.Add(this.tbCustomImageFile);
             this.panCustomImage.Controls.Add(this.lbCustomImageFile);
-            this.panCustomImage.Location = new System.Drawing.Point(145, 29);
+            this.panCustomImage.Location = new System.Drawing.Point(8, 6);
             this.panCustomImage.Name = "panCustomImage";
             this.panCustomImage.Size = new System.Drawing.Size(224, 303);
             this.panCustomImage.TabIndex = 5;
             this.panCustomImage.Visible = false;
             // 
+            // btnCustomImageBrowseFile
+            // 
+            this.btnCustomImageBrowseFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCustomImageBrowseFile.Location = new System.Drawing.Point(181, 44);
+            this.btnCustomImageBrowseFile.Name = "btnCustomImageBrowseFile";
+            this.btnCustomImageBrowseFile.Size = new System.Drawing.Size(21, 20);
+            this.btnCustomImageBrowseFile.TabIndex = 10;
+            this.btnCustomImageBrowseFile.Text = "..";
+            this.btnCustomImageBrowseFile.UseVisualStyleBackColor = true;
+            this.btnCustomImageBrowseFile.Click += new System.EventHandler(this.btnBrowseFile_Click);
+            // 
             // cmbCustomImageFormat
             // 
+            this.cmbCustomImageFormat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbCustomImageFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbCustomImageFormat.FormattingEnabled = true;
             this.cmbCustomImageFormat.Items.AddRange(new object[] {
             "RGB5A3",
             "RGBA8",
-            "RGB565"});
+            "RGB565",
+            "I4",
+            "I8",
+            "IA4",
+            "IA8"});
             this.cmbCustomImageFormat.Location = new System.Drawing.Point(61, 172);
             this.cmbCustomImageFormat.Name = "cmbCustomImageFormat";
             this.cmbCustomImageFormat.Size = new System.Drawing.Size(141, 21);
@@ -308,6 +355,8 @@ namespace ThemeMii
             // 
             // lbCimg
             // 
+            this.lbCimg.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lbCimg.Location = new System.Drawing.Point(0, 16);
             this.lbCimg.Name = "lbCimg";
             this.lbCimg.Size = new System.Drawing.Size(224, 13);
@@ -317,6 +366,8 @@ namespace ThemeMii
             // 
             // tbCustomImageHeight
             // 
+            this.tbCustomImageHeight.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbCustomImageHeight.Location = new System.Drawing.Point(61, 140);
             this.tbCustomImageHeight.Name = "tbCustomImageHeight";
             this.tbCustomImageHeight.Size = new System.Drawing.Size(141, 20);
@@ -325,6 +376,8 @@ namespace ThemeMii
             // 
             // tbCustomImageWidth
             // 
+            this.tbCustomImageWidth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbCustomImageWidth.Location = new System.Drawing.Point(61, 108);
             this.tbCustomImageWidth.Name = "tbCustomImageWidth";
             this.tbCustomImageWidth.Size = new System.Drawing.Size(141, 20);
@@ -333,6 +386,8 @@ namespace ThemeMii
             // 
             // tbCustomImageName
             // 
+            this.tbCustomImageName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbCustomImageName.Location = new System.Drawing.Point(61, 75);
             this.tbCustomImageName.Name = "tbCustomImageName";
             this.tbCustomImageName.Size = new System.Drawing.Size(141, 20);
@@ -376,6 +431,8 @@ namespace ThemeMii
             // 
             // tbCustomImageFile
             // 
+            this.tbCustomImageFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbCustomImageFile.Location = new System.Drawing.Point(61, 44);
             this.tbCustomImageFile.Name = "tbCustomImageFile";
             this.tbCustomImageFile.Size = new System.Drawing.Size(114, 20);
@@ -392,6 +449,9 @@ namespace ThemeMii
             // 
             // panStaticImage
             // 
+            this.panStaticImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.panStaticImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panStaticImage.Controls.Add(this.btnStaticImageBrowseFile);
             this.panStaticImage.Controls.Add(this.btnStaticImageBrowse);
@@ -408,7 +468,7 @@ namespace ThemeMii
             this.panStaticImage.Controls.Add(this.lbStaticImageSource);
             this.panStaticImage.Controls.Add(this.tbStaticImageFile);
             this.panStaticImage.Controls.Add(this.lbStaticImageFile);
-            this.panStaticImage.Location = new System.Drawing.Point(145, 29);
+            this.panStaticImage.Location = new System.Drawing.Point(8, 6);
             this.panStaticImage.Name = "panStaticImage";
             this.panStaticImage.Size = new System.Drawing.Size(224, 303);
             this.panStaticImage.TabIndex = 6;
@@ -416,6 +476,7 @@ namespace ThemeMii
             // 
             // btnStaticImageBrowseFile
             // 
+            this.btnStaticImageBrowseFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnStaticImageBrowseFile.Location = new System.Drawing.Point(181, 44);
             this.btnStaticImageBrowseFile.Name = "btnStaticImageBrowseFile";
             this.btnStaticImageBrowseFile.Size = new System.Drawing.Size(21, 20);
@@ -426,6 +487,7 @@ namespace ThemeMii
             // 
             // btnStaticImageBrowse
             // 
+            this.btnStaticImageBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnStaticImageBrowse.Location = new System.Drawing.Point(174, 257);
             this.btnStaticImageBrowse.Name = "btnStaticImageBrowse";
             this.btnStaticImageBrowse.Size = new System.Drawing.Size(28, 20);
@@ -436,12 +498,18 @@ namespace ThemeMii
             // 
             // cmbStaticImageFormat
             // 
+            this.cmbStaticImageFormat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbStaticImageFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbStaticImageFormat.FormattingEnabled = true;
             this.cmbStaticImageFormat.Items.AddRange(new object[] {
             "RGB5A3",
             "RGBA8",
-            "RGB565"});
+            "RGB565",
+            "I4",
+            "I8",
+            "IA4",
+            "IA8"});
             this.cmbStaticImageFormat.Location = new System.Drawing.Point(61, 172);
             this.cmbStaticImageFormat.Name = "cmbStaticImageFormat";
             this.cmbStaticImageFormat.Size = new System.Drawing.Size(141, 21);
@@ -449,6 +517,8 @@ namespace ThemeMii
             // 
             // lbSimg
             // 
+            this.lbSimg.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lbSimg.Location = new System.Drawing.Point(0, 16);
             this.lbSimg.Name = "lbSimg";
             this.lbSimg.Size = new System.Drawing.Size(224, 13);
@@ -458,6 +528,8 @@ namespace ThemeMii
             // 
             // tbStaticImageFilepath
             // 
+            this.tbStaticImageFilepath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStaticImageFilepath.Location = new System.Drawing.Point(16, 257);
             this.tbStaticImageFilepath.Name = "tbStaticImageFilepath";
             this.tbStaticImageFilepath.Size = new System.Drawing.Size(152, 20);
@@ -465,6 +537,8 @@ namespace ThemeMii
             // 
             // tbStaticImageHeight
             // 
+            this.tbStaticImageHeight.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStaticImageHeight.Location = new System.Drawing.Point(61, 140);
             this.tbStaticImageHeight.Name = "tbStaticImageHeight";
             this.tbStaticImageHeight.Size = new System.Drawing.Size(141, 20);
@@ -473,6 +547,8 @@ namespace ThemeMii
             // 
             // tbStaticImageWidth
             // 
+            this.tbStaticImageWidth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStaticImageWidth.Location = new System.Drawing.Point(61, 108);
             this.tbStaticImageWidth.Name = "tbStaticImageWidth";
             this.tbStaticImageWidth.Size = new System.Drawing.Size(141, 20);
@@ -481,6 +557,8 @@ namespace ThemeMii
             // 
             // tbStaticImageSource
             // 
+            this.tbStaticImageSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStaticImageSource.Location = new System.Drawing.Point(61, 75);
             this.tbStaticImageSource.Name = "tbStaticImageSource";
             this.tbStaticImageSource.Size = new System.Drawing.Size(141, 20);
@@ -488,6 +566,7 @@ namespace ThemeMii
             // 
             // lbStaticImageFilepath
             // 
+            this.lbStaticImageFilepath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbStaticImageFilepath.AutoSize = true;
             this.lbStaticImageFilepath.Location = new System.Drawing.Point(13, 241);
             this.lbStaticImageFilepath.Name = "lbStaticImageFilepath";
@@ -533,6 +612,8 @@ namespace ThemeMii
             // 
             // tbStaticImageFile
             // 
+            this.tbStaticImageFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStaticImageFile.Location = new System.Drawing.Point(61, 44);
             this.tbStaticImageFile.Name = "tbStaticImageFile";
             this.tbStaticImageFile.Size = new System.Drawing.Size(114, 20);
@@ -549,7 +630,8 @@ namespace ThemeMii
             // 
             // btnDown
             // 
-            this.btnDown.Location = new System.Drawing.Point(108, 312);
+            this.btnDown.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btnDown.Location = new System.Drawing.Point(105, 289);
             this.btnDown.Name = "btnDown";
             this.btnDown.Size = new System.Drawing.Size(30, 20);
             this.btnDown.TabIndex = 2;
@@ -559,7 +641,8 @@ namespace ThemeMii
             // 
             // btnUp
             // 
-            this.btnUp.Location = new System.Drawing.Point(76, 312);
+            this.btnUp.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btnUp.Location = new System.Drawing.Point(73, 289);
             this.btnUp.Name = "btnUp";
             this.btnUp.Size = new System.Drawing.Size(30, 20);
             this.btnUp.TabIndex = 2;
@@ -654,7 +737,7 @@ namespace ThemeMii
             this.msAddCustomImage,
             this.msAddCustomData});
             this.msAdd.Name = "msAdd";
-            this.msAdd.Size = new System.Drawing.Size(198, 22);
+            this.msAdd.Size = new System.Drawing.Size(203, 22);
             this.msAdd.Text = "Add";
             // 
             // msAddContainer
@@ -696,7 +779,7 @@ namespace ThemeMii
             // 
             this.msRemove.Name = "msRemove";
             this.msRemove.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.msRemove.Size = new System.Drawing.Size(229, 22);
+            this.msRemove.Size = new System.Drawing.Size(203, 22);
             this.msRemove.Text = "Remove";
             this.msRemove.Click += new System.EventHandler(this.btnMinus_Click);
             // 
@@ -704,7 +787,7 @@ namespace ThemeMii
             // 
             this.msMoveUp.Name = "msMoveUp";
             this.msMoveUp.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Up)));
-            this.msMoveUp.Size = new System.Drawing.Size(229, 22);
+            this.msMoveUp.Size = new System.Drawing.Size(203, 22);
             this.msMoveUp.Text = "Move Up";
             this.msMoveUp.Click += new System.EventHandler(this.SwapEntryUp);
             // 
@@ -712,7 +795,7 @@ namespace ThemeMii
             // 
             this.msMoveDown.Name = "msMoveDown";
             this.msMoveDown.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Down)));
-            this.msMoveDown.Size = new System.Drawing.Size(229, 22);
+            this.msMoveDown.Size = new System.Drawing.Size(203, 22);
             this.msMoveDown.Text = "Move Down";
             this.msMoveDown.Click += new System.EventHandler(this.SwapEntryDown);
             // 
@@ -735,12 +818,12 @@ namespace ThemeMii
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(195, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(200, 6);
             // 
             // msRemoveMissingStatics
             // 
             this.msRemoveMissingStatics.Name = "msRemoveMissingStatics";
-            this.msRemoveMissingStatics.Size = new System.Drawing.Size(198, 22);
+            this.msRemoveMissingStatics.Size = new System.Drawing.Size(203, 22);
             this.msRemoveMissingStatics.Text = "Remove Missing Statics";
             this.msRemoveMissingStatics.Click += new System.EventHandler(this.msRemoveMissingStatics_Click);
             // 
@@ -751,6 +834,10 @@ namespace ThemeMii
             this.msContainerManage,
             this.msImageSizeFromPng,
             this.msIgnoreMissingEntries,
+            this.toolStripSeparator4,
+            this.msLz77Containers,
+            this.msKeepExtractedApp,
+            this.msSavePrompt,
             this.toolStripSeparator2,
             this.msStandardSysMenu});
             this.msOptions.Name = "msOptions";
@@ -761,7 +848,7 @@ namespace ThemeMii
             // 
             this.msSourceManage.CheckOnClick = true;
             this.msSourceManage.Name = "msSourceManage";
-            this.msSourceManage.Size = new System.Drawing.Size(205, 22);
+            this.msSourceManage.Size = new System.Drawing.Size(213, 22);
             this.msSourceManage.Text = "Auto-Source-Manage";
             this.msSourceManage.Click += new System.EventHandler(this.msAutoManage_Click);
             // 
@@ -769,7 +856,7 @@ namespace ThemeMii
             // 
             this.msContainerManage.CheckOnClick = true;
             this.msContainerManage.Name = "msContainerManage";
-            this.msContainerManage.Size = new System.Drawing.Size(205, 22);
+            this.msContainerManage.Size = new System.Drawing.Size(213, 22);
             this.msContainerManage.Text = "Auto-Container-Manage";
             this.msContainerManage.Click += new System.EventHandler(this.msContainerManage_Click);
             // 
@@ -777,7 +864,7 @@ namespace ThemeMii
             // 
             this.msImageSizeFromPng.CheckOnClick = true;
             this.msImageSizeFromPng.Name = "msImageSizeFromPng";
-            this.msImageSizeFromPng.Size = new System.Drawing.Size(205, 22);
+            this.msImageSizeFromPng.Size = new System.Drawing.Size(213, 22);
             this.msImageSizeFromPng.Text = "Image Size from PNG";
             this.msImageSizeFromPng.Click += new System.EventHandler(this.msImageSizeFromPng_Click);
             // 
@@ -785,14 +872,43 @@ namespace ThemeMii
             // 
             this.msIgnoreMissingEntries.CheckOnClick = true;
             this.msIgnoreMissingEntries.Name = "msIgnoreMissingEntries";
-            this.msIgnoreMissingEntries.Size = new System.Drawing.Size(205, 22);
+            this.msIgnoreMissingEntries.Size = new System.Drawing.Size(213, 22);
             this.msIgnoreMissingEntries.Text = "Ignore Missing Entries";
             this.msIgnoreMissingEntries.Click += new System.EventHandler(this.msIgnoreMissingEntries_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(210, 6);
+            // 
+            // msLz77Containers
+            // 
+            this.msLz77Containers.CheckOnClick = true;
+            this.msLz77Containers.Name = "msLz77Containers";
+            this.msLz77Containers.Size = new System.Drawing.Size(213, 22);
+            this.msLz77Containers.Text = "Lz77 Compress Containers";
+            this.msLz77Containers.Click += new System.EventHandler(this.msLz77Containers_Click);
+            // 
+            // msKeepExtractedApp
+            // 
+            this.msKeepExtractedApp.CheckOnClick = true;
+            this.msKeepExtractedApp.Name = "msKeepExtractedApp";
+            this.msKeepExtractedApp.Size = new System.Drawing.Size(213, 22);
+            this.msKeepExtractedApp.Text = "Keep Extracted Base App";
+            this.msKeepExtractedApp.Click += new System.EventHandler(this.msKeepExtractedApp_Click);
+            // 
+            // msSavePrompt
+            // 
+            this.msSavePrompt.CheckOnClick = true;
+            this.msSavePrompt.Name = "msSavePrompt";
+            this.msSavePrompt.Size = new System.Drawing.Size(213, 22);
+            this.msSavePrompt.Text = "Save Prompt when Exiting";
+            this.msSavePrompt.Click += new System.EventHandler(this.msSavePrompt_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(202, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(210, 6);
             // 
             // msStandardSysMenu
             // 
@@ -802,7 +918,7 @@ namespace ThemeMii
             this.ms41,
             this.ms42});
             this.msStandardSysMenu.Name = "msStandardSysMenu";
-            this.msStandardSysMenu.Size = new System.Drawing.Size(205, 22);
+            this.msStandardSysMenu.Size = new System.Drawing.Size(213, 22);
             this.msStandardSysMenu.Text = "Standard System Menu";
             // 
             // ms32
@@ -944,32 +1060,40 @@ namespace ThemeMii
             // msTools
             // 
             this.msTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnCsmToMym,
+            this.msCsmToMym,
             this.msBrowseBaseApp,
+            this.msInstallToNandBackup,
             this.toolStripSeparator3,
             this.msDownloadBaseApp});
             this.msTools.Name = "msTools";
             this.msTools.Size = new System.Drawing.Size(48, 20);
             this.msTools.Text = "Tools";
             // 
-            // btnCsmToMym
+            // msCsmToMym
             // 
-            this.btnCsmToMym.Name = "btnCsmToMym";
-            this.btnCsmToMym.Size = new System.Drawing.Size(180, 22);
-            this.btnCsmToMym.Text = "csm to mym";
-            this.btnCsmToMym.Click += new System.EventHandler(this.btnCsmToMym_Click);
+            this.msCsmToMym.Name = "msCsmToMym";
+            this.msCsmToMym.Size = new System.Drawing.Size(236, 22);
+            this.msCsmToMym.Text = "csm to mym";
+            this.msCsmToMym.Click += new System.EventHandler(this.msCsmToMym_Click);
             // 
             // msBrowseBaseApp
             // 
             this.msBrowseBaseApp.Name = "msBrowseBaseApp";
-            this.msBrowseBaseApp.Size = new System.Drawing.Size(180, 22);
+            this.msBrowseBaseApp.Size = new System.Drawing.Size(236, 22);
             this.msBrowseBaseApp.Text = "Browse Base App";
             this.msBrowseBaseApp.Click += new System.EventHandler(this.btnBrowseFile_Click);
+            // 
+            // msInstallToNandBackup
+            // 
+            this.msInstallToNandBackup.Name = "msInstallToNandBackup";
+            this.msInstallToNandBackup.Size = new System.Drawing.Size(236, 22);
+            this.msInstallToNandBackup.Text = "Install Theme To Nand Backup";
+            this.msInstallToNandBackup.Click += new System.EventHandler(this.msInstallToNandBackup_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(233, 6);
             // 
             // msDownloadBaseApp
             // 
@@ -979,7 +1103,7 @@ namespace ThemeMii
             this.msDownload41,
             this.msDownload42});
             this.msDownloadBaseApp.Name = "msDownloadBaseApp";
-            this.msDownloadBaseApp.Size = new System.Drawing.Size(180, 22);
+            this.msDownloadBaseApp.Size = new System.Drawing.Size(236, 22);
             this.msDownloadBaseApp.Text = "Download Base App";
             // 
             // msDownload32
@@ -1109,21 +1233,37 @@ namespace ThemeMii
             // msQuestion
             // 
             this.msQuestion.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.msHelp,
+            this.toolStripSeparator5,
             this.msAbout});
             this.msQuestion.Name = "msQuestion";
             this.msQuestion.Size = new System.Drawing.Size(24, 20);
             this.msQuestion.Text = "?";
             // 
+            // msHelp
+            // 
+            this.msHelp.Name = "msHelp";
+            this.msHelp.ShortcutKeys = System.Windows.Forms.Keys.F1;
+            this.msHelp.Size = new System.Drawing.Size(118, 22);
+            this.msHelp.Text = "Help";
+            this.msHelp.Click += new System.EventHandler(this.msHelp_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(115, 6);
+            // 
             // msAbout
             // 
             this.msAbout.Name = "msAbout";
-            this.msAbout.Size = new System.Drawing.Size(152, 22);
+            this.msAbout.Size = new System.Drawing.Size(118, 22);
             this.msAbout.Text = "About";
             this.msAbout.Click += new System.EventHandler(this.msAbout_Click);
             // 
             // btnMinus
             // 
-            this.btnMinus.Location = new System.Drawing.Point(44, 312);
+            this.btnMinus.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btnMinus.Location = new System.Drawing.Point(41, 289);
             this.btnMinus.Name = "btnMinus";
             this.btnMinus.Size = new System.Drawing.Size(30, 20);
             this.btnMinus.TabIndex = 2;
@@ -1133,7 +1273,8 @@ namespace ThemeMii
             // 
             // btnPlus
             // 
-            this.btnPlus.Location = new System.Drawing.Point(12, 312);
+            this.btnPlus.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btnPlus.Location = new System.Drawing.Point(9, 289);
             this.btnPlus.Name = "btnPlus";
             this.btnPlus.Size = new System.Drawing.Size(30, 20);
             this.btnPlus.TabIndex = 2;
@@ -1143,6 +1284,9 @@ namespace ThemeMii
             // 
             // panCustomData
             // 
+            this.panCustomData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.panCustomData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panCustomData.Controls.Add(this.btnCustomDataBrowseFile);
             this.panCustomData.Controls.Add(this.lbCdta);
@@ -1150,14 +1294,27 @@ namespace ThemeMii
             this.panCustomData.Controls.Add(this.lbCustomDataName);
             this.panCustomData.Controls.Add(this.tbCustomDataFile);
             this.panCustomData.Controls.Add(this.lbCustomDataFile);
-            this.panCustomData.Location = new System.Drawing.Point(145, 29);
+            this.panCustomData.Location = new System.Drawing.Point(8, 6);
             this.panCustomData.Name = "panCustomData";
             this.panCustomData.Size = new System.Drawing.Size(224, 303);
             this.panCustomData.TabIndex = 7;
             this.panCustomData.Visible = false;
             // 
+            // btnCustomDataBrowseFile
+            // 
+            this.btnCustomDataBrowseFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCustomDataBrowseFile.Location = new System.Drawing.Point(181, 44);
+            this.btnCustomDataBrowseFile.Name = "btnCustomDataBrowseFile";
+            this.btnCustomDataBrowseFile.Size = new System.Drawing.Size(21, 20);
+            this.btnCustomDataBrowseFile.TabIndex = 10;
+            this.btnCustomDataBrowseFile.Text = "..";
+            this.btnCustomDataBrowseFile.UseVisualStyleBackColor = true;
+            this.btnCustomDataBrowseFile.Click += new System.EventHandler(this.btnBrowseFile_Click);
+            // 
             // lbCdta
             // 
+            this.lbCdta.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lbCdta.Location = new System.Drawing.Point(0, 16);
             this.lbCdta.Name = "lbCdta";
             this.lbCdta.Size = new System.Drawing.Size(224, 13);
@@ -1167,6 +1324,8 @@ namespace ThemeMii
             // 
             // tbCustomDataName
             // 
+            this.tbCustomDataName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbCustomDataName.Location = new System.Drawing.Point(61, 75);
             this.tbCustomDataName.Name = "tbCustomDataName";
             this.tbCustomDataName.Size = new System.Drawing.Size(141, 20);
@@ -1183,6 +1342,8 @@ namespace ThemeMii
             // 
             // tbCustomDataFile
             // 
+            this.tbCustomDataFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbCustomDataFile.Location = new System.Drawing.Point(61, 44);
             this.tbCustomDataFile.Name = "tbCustomDataFile";
             this.tbCustomDataFile.Size = new System.Drawing.Size(114, 20);
@@ -1199,6 +1360,9 @@ namespace ThemeMii
             // 
             // panStaticData
             // 
+            this.panStaticData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.panStaticData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panStaticData.Controls.Add(this.btnStaticDataBrowseFile);
             this.panStaticData.Controls.Add(this.btnStaticDataBrowse);
@@ -1209,7 +1373,7 @@ namespace ThemeMii
             this.panStaticData.Controls.Add(this.lbStaticDataSource);
             this.panStaticData.Controls.Add(this.tbStaticDataFile);
             this.panStaticData.Controls.Add(this.lbStaticDataFile);
-            this.panStaticData.Location = new System.Drawing.Point(145, 29);
+            this.panStaticData.Location = new System.Drawing.Point(8, 6);
             this.panStaticData.Name = "panStaticData";
             this.panStaticData.Size = new System.Drawing.Size(224, 303);
             this.panStaticData.TabIndex = 8;
@@ -1217,6 +1381,7 @@ namespace ThemeMii
             // 
             // btnStaticDataBrowseFile
             // 
+            this.btnStaticDataBrowseFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnStaticDataBrowseFile.Location = new System.Drawing.Point(181, 44);
             this.btnStaticDataBrowseFile.Name = "btnStaticDataBrowseFile";
             this.btnStaticDataBrowseFile.Size = new System.Drawing.Size(21, 20);
@@ -1227,6 +1392,7 @@ namespace ThemeMii
             // 
             // btnStaticDataBrowse
             // 
+            this.btnStaticDataBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnStaticDataBrowse.Location = new System.Drawing.Point(174, 257);
             this.btnStaticDataBrowse.Name = "btnStaticDataBrowse";
             this.btnStaticDataBrowse.Size = new System.Drawing.Size(28, 20);
@@ -1237,6 +1403,8 @@ namespace ThemeMii
             // 
             // tbStaticDataFilepath
             // 
+            this.tbStaticDataFilepath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStaticDataFilepath.Location = new System.Drawing.Point(16, 257);
             this.tbStaticDataFilepath.Name = "tbStaticDataFilepath";
             this.tbStaticDataFilepath.Size = new System.Drawing.Size(152, 20);
@@ -1244,6 +1412,7 @@ namespace ThemeMii
             // 
             // lbStaticDataFilepath
             // 
+            this.lbStaticDataFilepath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbStaticDataFilepath.AutoSize = true;
             this.lbStaticDataFilepath.Location = new System.Drawing.Point(13, 241);
             this.lbStaticDataFilepath.Name = "lbStaticDataFilepath";
@@ -1253,6 +1422,8 @@ namespace ThemeMii
             // 
             // lbSdta
             // 
+            this.lbSdta.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lbSdta.Location = new System.Drawing.Point(0, 16);
             this.lbSdta.Name = "lbSdta";
             this.lbSdta.Size = new System.Drawing.Size(224, 13);
@@ -1262,6 +1433,8 @@ namespace ThemeMii
             // 
             // tbStaticDataSource
             // 
+            this.tbStaticDataSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStaticDataSource.Location = new System.Drawing.Point(61, 75);
             this.tbStaticDataSource.Name = "tbStaticDataSource";
             this.tbStaticDataSource.Size = new System.Drawing.Size(141, 20);
@@ -1278,6 +1451,8 @@ namespace ThemeMii
             // 
             // tbStaticDataFile
             // 
+            this.tbStaticDataFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.tbStaticDataFile.Location = new System.Drawing.Point(61, 44);
             this.tbStaticDataFile.Name = "tbStaticDataFile";
             this.tbStaticDataFile.Size = new System.Drawing.Size(114, 20);
@@ -1294,8 +1469,11 @@ namespace ThemeMii
             // 
             // panEmpty
             // 
+            this.panEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.panEmpty.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panEmpty.Location = new System.Drawing.Point(145, 29);
+            this.panEmpty.Location = new System.Drawing.Point(8, 6);
             this.panEmpty.Name = "panEmpty";
             this.panEmpty.Size = new System.Drawing.Size(224, 303);
             this.panEmpty.TabIndex = 9;
@@ -1327,7 +1505,9 @@ namespace ThemeMii
             // 
             // btnSaveMym
             // 
-            this.btnSaveMym.Location = new System.Drawing.Point(12, 342);
+            this.btnSaveMym.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.btnSaveMym.AutoSize = true;
+            this.btnSaveMym.Location = new System.Drawing.Point(4, 7);
             this.btnSaveMym.Name = "btnSaveMym";
             this.btnSaveMym.Size = new System.Drawing.Size(173, 23);
             this.btnSaveMym.TabIndex = 11;
@@ -1337,7 +1517,9 @@ namespace ThemeMii
             // 
             // btnCreateCsm
             // 
-            this.btnCreateCsm.Location = new System.Drawing.Point(197, 342);
+            this.btnCreateCsm.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.btnCreateCsm.AutoSize = true;
+            this.btnCreateCsm.Location = new System.Drawing.Point(197, 7);
             this.btnCreateCsm.Name = "btnCreateCsm";
             this.btnCreateCsm.Size = new System.Drawing.Size(173, 23);
             this.btnCreateCsm.TabIndex = 11;
@@ -1391,49 +1573,67 @@ namespace ThemeMii
             this.cmAddCustomData.Text = "Custom Data";
             this.cmAddCustomData.Click += new System.EventHandler(this.msAddCustomData_Click);
             // 
-            // btnCustomImageBrowseFile
+            // panList
             // 
-            this.btnCustomImageBrowseFile.Location = new System.Drawing.Point(181, 44);
-            this.btnCustomImageBrowseFile.Name = "btnCustomImageBrowseFile";
-            this.btnCustomImageBrowseFile.Size = new System.Drawing.Size(21, 20);
-            this.btnCustomImageBrowseFile.TabIndex = 10;
-            this.btnCustomImageBrowseFile.Text = "..";
-            this.btnCustomImageBrowseFile.UseVisualStyleBackColor = true;
-            this.btnCustomImageBrowseFile.Click += new System.EventHandler(this.btnBrowseFile_Click);
+            this.panList.Controls.Add(this.lbxIniEntries);
+            this.panList.Controls.Add(this.btnDown);
+            this.panList.Controls.Add(this.btnUp);
+            this.panList.Controls.Add(this.btnMinus);
+            this.panList.Controls.Add(this.btnPlus);
+            this.panList.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panList.Location = new System.Drawing.Point(0, 24);
+            this.panList.Name = "panList";
+            this.panList.Size = new System.Drawing.Size(141, 314);
+            this.panList.TabIndex = 12;
             // 
-            // btnCustomDataBrowseFile
+            // panButtons
             // 
-            this.btnCustomDataBrowseFile.Location = new System.Drawing.Point(181, 44);
-            this.btnCustomDataBrowseFile.Name = "btnCustomDataBrowseFile";
-            this.btnCustomDataBrowseFile.Size = new System.Drawing.Size(21, 20);
-            this.btnCustomDataBrowseFile.TabIndex = 10;
-            this.btnCustomDataBrowseFile.Text = "..";
-            this.btnCustomDataBrowseFile.UseVisualStyleBackColor = true;
-            this.btnCustomDataBrowseFile.Click += new System.EventHandler(this.btnBrowseFile_Click);
+            this.panButtons.Controls.Add(this.btnCreateCsm);
+            this.panButtons.Controls.Add(this.btnSaveMym);
+            this.panButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panButtons.Location = new System.Drawing.Point(0, 338);
+            this.panButtons.Name = "panButtons";
+            this.panButtons.Size = new System.Drawing.Size(382, 35);
+            this.panButtons.TabIndex = 13;
+            // 
+            // panPanels
+            // 
+            this.panPanels.Controls.Add(this.panStaticData);
+            this.panPanels.Controls.Add(this.panCustomData);
+            this.panPanels.Controls.Add(this.panStaticImage);
+            this.panPanels.Controls.Add(this.panCustomImage);
+            this.panPanels.Controls.Add(this.panContainer);
+            this.panPanels.Controls.Add(this.panEmpty);
+            this.panPanels.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panPanels.Location = new System.Drawing.Point(141, 24);
+            this.panPanels.Name = "panPanels";
+            this.panPanels.Size = new System.Drawing.Size(241, 314);
+            this.panPanels.TabIndex = 14;
+            // 
+            // lbContainerInfo
+            // 
+            this.lbContainerInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbContainerInfo.Location = new System.Drawing.Point(13, 109);
+            this.lbContainerInfo.Name = "lbContainerInfo";
+            this.lbContainerInfo.Size = new System.Drawing.Size(189, 48);
+            this.lbContainerInfo.TabIndex = 11;
+            this.lbContainerInfo.Text = "Type is obsolete for ThemeMii, as it will automatically check each container for " +
+                "compression.";
+            this.lbContainerInfo.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // ThemeMii_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(382, 395);
-            this.Controls.Add(this.btnCreateCsm);
-            this.Controls.Add(this.btnSaveMym);
-            this.Controls.Add(this.ssStatus);
-            this.Controls.Add(this.btnPlus);
-            this.Controls.Add(this.btnMinus);
-            this.Controls.Add(this.btnUp);
-            this.Controls.Add(this.btnDown);
-            this.Controls.Add(this.lbxIniEntries);
+            this.Controls.Add(this.panPanels);
+            this.Controls.Add(this.panList);
+            this.Controls.Add(this.panButtons);
             this.Controls.Add(this.msMain);
-            this.Controls.Add(this.panStaticData);
-            this.Controls.Add(this.panCustomData);
-            this.Controls.Add(this.panStaticImage);
-            this.Controls.Add(this.panCustomImage);
-            this.Controls.Add(this.panContainer);
-            this.Controls.Add(this.panEmpty);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Controls.Add(this.ssStatus);
             this.MainMenuStrip = this.msMain;
-            this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(398, 433);
             this.Name = "ThemeMii_Main";
             this.Text = "ThemeMii X by Leathl";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ThemeMii_Main_FormClosing);
@@ -1453,6 +1653,10 @@ namespace ThemeMii
             this.ssStatus.ResumeLayout(false);
             this.ssStatus.PerformLayout();
             this.cmAdd.ResumeLayout(false);
+            this.panList.ResumeLayout(false);
+            this.panButtons.ResumeLayout(false);
+            this.panButtons.PerformLayout();
+            this.panPanels.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1588,7 +1792,7 @@ namespace ThemeMii
         private System.Windows.Forms.ToolStripMenuItem msDownload42U;
         private System.Windows.Forms.ToolStripMenuItem msDownload42E;
         private System.Windows.Forms.ToolStripMenuItem msImageSizeFromPng;
-        private System.Windows.Forms.ToolStripMenuItem btnCsmToMym;
+        private System.Windows.Forms.ToolStripMenuItem msCsmToMym;
         private System.Windows.Forms.Button btnStaticDataBrowseFile;
         private System.Windows.Forms.Button btnStaticImageBrowseFile;
         private System.Windows.Forms.ToolStripMenuItem msBrowseBaseApp;
@@ -1597,5 +1801,16 @@ namespace ThemeMii
         private System.Windows.Forms.Button btnContainerBrowseFile;
         private System.Windows.Forms.Button btnCustomImageBrowseFile;
         private System.Windows.Forms.Button btnCustomDataBrowseFile;
+        private System.Windows.Forms.ToolStripMenuItem msKeepExtractedApp;
+        private System.Windows.Forms.ToolStripMenuItem msLz77Containers;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.Panel panList;
+        private System.Windows.Forms.Panel panButtons;
+        private System.Windows.Forms.Panel panPanels;
+        private System.Windows.Forms.ToolStripMenuItem msHelp;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem msInstallToNandBackup;
+        private System.Windows.Forms.ToolStripMenuItem msSavePrompt;
+        private System.Windows.Forms.Label lbContainerInfo;
     }
 }

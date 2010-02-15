@@ -21,7 +21,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -84,6 +83,19 @@ namespace ThemeMii
             catch { }
         }
 
+        private void ExitApplication()
+        {
+            SaveSettings();
+
+            try
+            {
+                Directory.Delete(tempDir, true);
+            }
+            catch { }
+
+            Environment.Exit(0);
+        }
+
         private void SetControls(bool enable)
         {
             MethodInvoker m;
@@ -94,6 +106,17 @@ namespace ThemeMii
                 m = new MethodInvoker(this._setControlsFalse);
 
             this.Invoke(m);
+        }
+
+        private void SetControlsRecursive(Control parentCtrl, bool state)
+        {
+            foreach (Control thisControl in parentCtrl.Controls)
+            {
+                if (thisControl is Button) ((Button)thisControl).Enabled = state;
+                else if (thisControl is TextBox) ((TextBox)thisControl).Enabled = state;
+
+                if (thisControl.Controls.Count > 0) SetControlsRecursive(thisControl, state);
+            }
         }
 
         private void HidePanels()
@@ -107,14 +130,22 @@ namespace ThemeMii
 
         private void LoadSettings()
         {
-            containerManage = Properties.Settings.Default.containerManage;
-            msContainerManage.Checked = containerManage;
-            sourceManage = Properties.Settings.Default.sourceManage;
-            msSourceManage.Checked = sourceManage;
-            autoImageSize = Properties.Settings.Default.autoImageSize;
-            msImageSizeFromPng.Checked = autoImageSize;
-            ignoreMissing = Properties.Settings.Default.ignoreMissing;
-            msIgnoreMissingEntries.Checked = ignoreMissing;
+            settings.savePrompt = Properties.Settings.Default.savePrompt;
+            msSavePrompt.Checked = settings.savePrompt;
+            settings.lz77Containers = Properties.Settings.Default.lz77Containers;
+            msLz77Containers.Checked = settings.lz77Containers;
+            settings.keepExtractedApp = Properties.Settings.Default.keepExtractedApp;
+            msKeepExtractedApp.Checked = settings.keepExtractedApp;
+            settings.containerManage = Properties.Settings.Default.containerManage;
+            msContainerManage.Checked = settings.containerManage;
+            settings.sourceManage = Properties.Settings.Default.sourceManage;
+            msSourceManage.Checked = settings.sourceManage;
+            settings.autoImageSize = Properties.Settings.Default.autoImageSize;
+            msImageSizeFromPng.Checked = settings.autoImageSize;
+            settings.ignoreMissing = Properties.Settings.Default.ignoreMissing;
+            msIgnoreMissingEntries.Checked = settings.ignoreMissing;
+
+            lastExtracted = (BaseApp)Properties.Settings.Default.lastExtracted;
 
             BaseApp bApp = (BaseApp)Properties.Settings.Default.standardMenu;
             UncheckSysMenus();
@@ -131,12 +162,12 @@ namespace ThemeMii
             else if (bApp == BaseApp.U41) ms41U.Checked = true;
             else if (bApp == BaseApp.U42) ms42U.Checked = true;
 
-            if (sourceManage)
+            if (settings.sourceManage)
             {
                 tbStaticDataSource.Enabled = false;
                 tbStaticImageSource.Enabled = false;
             }
-            if (autoImageSize)
+            if (settings.autoImageSize)
             {
                 tbStaticImageWidth.Enabled = false;
                 tbStaticImageHeight.Enabled = false;
@@ -148,10 +179,15 @@ namespace ThemeMii
         private void SaveSettings()
         {
             Properties.Settings.Default.firstRun = false;
-            Properties.Settings.Default.containerManage = containerManage;
-            Properties.Settings.Default.sourceManage = sourceManage;
-            Properties.Settings.Default.autoImageSize = autoImageSize;
-            Properties.Settings.Default.ignoreMissing = ignoreMissing;
+            Properties.Settings.Default.savePrompt = settings.savePrompt;
+            Properties.Settings.Default.lz77Containers = settings.lz77Containers;
+            Properties.Settings.Default.keepExtractedApp = settings.keepExtractedApp;
+            Properties.Settings.Default.containerManage = settings.containerManage;
+            Properties.Settings.Default.sourceManage = settings.sourceManage;
+            Properties.Settings.Default.autoImageSize = settings.autoImageSize;
+            Properties.Settings.Default.ignoreMissing = settings.ignoreMissing;
+
+            Properties.Settings.Default.lastExtracted = (int)lastExtracted;
 
             Properties.Settings.Default.standardMenu = (int)GetBaseApp();
 
@@ -261,19 +297,32 @@ namespace ThemeMii
             {
                 tempEntry.file = (tbCustomImageFile.Text.StartsWith("\\")) ? tbCustomImageFile.Text : tbCustomImageFile.Text.Insert(0, "\\");
                 tempEntry.name = tbCustomImageName.Text;
-                if (!autoImageSize) tempEntry.width = int.Parse(tbCustomImageWidth.Text);
-                if (!autoImageSize) tempEntry.height = int.Parse(tbCustomImageHeight.Text);
-                tempEntry.format = (cmbCustomImageFormat.SelectedIndex == 0) ? iniEntry.TplFormat.RGB5A3 :
-                    (cmbCustomImageFormat.SelectedIndex == 1) ? iniEntry.TplFormat.RGBA8 : iniEntry.TplFormat.RGB565;
+                if (!settings.autoImageSize) tempEntry.width = int.Parse(tbCustomImageWidth.Text);
+                if (!settings.autoImageSize) tempEntry.height = int.Parse(tbCustomImageHeight.Text);
+
+                if (cmbCustomImageFormat.SelectedIndex == 0) tempEntry.format = iniEntry.TplFormat.RGB5A3;
+                else if (cmbCustomImageFormat.SelectedIndex == 1) tempEntry.format = iniEntry.TplFormat.RGBA8;
+                else if (cmbCustomImageFormat.SelectedIndex == 2) tempEntry.format = iniEntry.TplFormat.RGB565;
+                else if (cmbCustomImageFormat.SelectedIndex == 3) tempEntry.format = iniEntry.TplFormat.I4;
+                else if (cmbCustomImageFormat.SelectedIndex == 4) tempEntry.format = iniEntry.TplFormat.I8;
+                else if (cmbCustomImageFormat.SelectedIndex == 5) tempEntry.format = iniEntry.TplFormat.IA4;
+                else if (cmbCustomImageFormat.SelectedIndex == 6) tempEntry.format = iniEntry.TplFormat.IA8;
+
             }
             else if (tempEntry.entryType == iniEntry.EntryType.StaticImage)
             {
                 tempEntry.file = (tbStaticImageFile.Text.StartsWith("\\")) ? tbStaticImageFile.Text : tbStaticImageFile.Text.Insert(0, "\\");
-                if (!sourceManage) tempEntry.source = (tbStaticImageSource.Text.StartsWith("\\")) ? tbStaticImageSource.Text : tbStaticImageSource.Text.Insert(0, "\\");
-                if (!autoImageSize) tempEntry.width = int.Parse(tbStaticImageWidth.Text);
-                if (!autoImageSize) tempEntry.height = int.Parse(tbStaticImageHeight.Text);
-                tempEntry.format = (cmbStaticImageFormat.SelectedIndex == 0) ? iniEntry.TplFormat.RGB5A3 :
-                    (cmbStaticImageFormat.SelectedIndex == 1) ? iniEntry.TplFormat.RGBA8 : iniEntry.TplFormat.RGB565;
+                if (!settings.sourceManage) tempEntry.source = (tbStaticImageSource.Text.StartsWith("\\")) ? tbStaticImageSource.Text : tbStaticImageSource.Text.Insert(0, "\\");
+                if (!settings.autoImageSize) tempEntry.width = int.Parse(tbStaticImageWidth.Text);
+                if (!settings.autoImageSize) tempEntry.height = int.Parse(tbStaticImageHeight.Text);
+
+                if (cmbStaticImageFormat.SelectedIndex == 0) tempEntry.format = iniEntry.TplFormat.RGB5A3;
+                else if (cmbStaticImageFormat.SelectedIndex == 1) tempEntry.format = iniEntry.TplFormat.RGBA8;
+                else if (cmbStaticImageFormat.SelectedIndex == 2) tempEntry.format = iniEntry.TplFormat.RGB565;
+                else if (cmbStaticImageFormat.SelectedIndex == 3) tempEntry.format = iniEntry.TplFormat.I4;
+                else if (cmbStaticImageFormat.SelectedIndex == 4) tempEntry.format = iniEntry.TplFormat.I8;
+                else if (cmbStaticImageFormat.SelectedIndex == 5) tempEntry.format = iniEntry.TplFormat.IA4;
+                else if (cmbStaticImageFormat.SelectedIndex == 6) tempEntry.format = iniEntry.TplFormat.IA8;
 
                 tempEntry.filepath = tbStaticImageFilepath.Text;
             }
@@ -285,7 +334,7 @@ namespace ThemeMii
             else if (tempEntry.entryType == iniEntry.EntryType.StaticData)
             {
                 tempEntry.file = (tbStaticDataFile.Text.StartsWith("\\")) ? tbStaticDataFile.Text : tbStaticDataFile.Text.Insert(0, "\\");
-                if (!sourceManage) tempEntry.source = (tbStaticDataSource.Text.StartsWith("\\")) ? tbStaticDataSource.Text : tbStaticDataSource.Text.Insert(0, "\\");
+                if (!settings.sourceManage) tempEntry.source = (tbStaticDataSource.Text.StartsWith("\\")) ? tbStaticDataSource.Text : tbStaticDataSource.Text.Insert(0, "\\");
 
                 tempEntry.filepath = tbStaticDataFilepath.Text;
             }
@@ -308,19 +357,31 @@ namespace ThemeMii
                 {
                     tempEntry.file = (tbCustomImageFile.Text.StartsWith("\\")) ? tbCustomImageFile.Text : tbCustomImageFile.Text.Insert(0, "\\");
                     tempEntry.name = tbCustomImageName.Text;
-                    if (!autoImageSize) tempEntry.width = int.Parse(tbCustomImageWidth.Text);
-                    if (!autoImageSize) tempEntry.height = int.Parse(tbCustomImageHeight.Text);
-                    tempEntry.format = (cmbCustomImageFormat.SelectedIndex == 0) ? iniEntry.TplFormat.RGB5A3 :
-                        (cmbCustomImageFormat.SelectedIndex == 1) ? iniEntry.TplFormat.RGBA8 : iniEntry.TplFormat.RGB565;
+                    if (!settings.autoImageSize) tempEntry.width = int.Parse(tbCustomImageWidth.Text);
+                    if (!settings.autoImageSize) tempEntry.height = int.Parse(tbCustomImageHeight.Text);
+
+                    if (cmbCustomImageFormat.SelectedIndex == 0) tempEntry.format = iniEntry.TplFormat.RGB5A3;
+                    else if (cmbCustomImageFormat.SelectedIndex == 1) tempEntry.format = iniEntry.TplFormat.RGBA8;
+                    else if (cmbCustomImageFormat.SelectedIndex == 2) tempEntry.format = iniEntry.TplFormat.RGB565;
+                    else if (cmbCustomImageFormat.SelectedIndex == 3) tempEntry.format = iniEntry.TplFormat.I4;
+                    else if (cmbCustomImageFormat.SelectedIndex == 4) tempEntry.format = iniEntry.TplFormat.I8;
+                    else if (cmbCustomImageFormat.SelectedIndex == 5) tempEntry.format = iniEntry.TplFormat.IA4;
+                    else if (cmbCustomImageFormat.SelectedIndex == 6) tempEntry.format = iniEntry.TplFormat.IA8;
                 }
                 else if (tempEntry.entryType == iniEntry.EntryType.StaticImage)
                 {
                     tempEntry.file = (tbStaticImageFile.Text.StartsWith("\\")) ? tbStaticImageFile.Text : tbStaticImageFile.Text.Insert(0, "\\");
-                    if (!sourceManage) tempEntry.source = (tbStaticImageSource.Text.StartsWith("\\")) ? tbStaticImageSource.Text : tbStaticImageSource.Text.Insert(0, "\\");
-                    if (!autoImageSize) tempEntry.width = int.Parse(tbStaticImageWidth.Text);
-                    if (!autoImageSize) tempEntry.height = int.Parse(tbStaticImageHeight.Text);
-                    tempEntry.format = (cmbStaticImageFormat.SelectedIndex == 0) ? iniEntry.TplFormat.RGB5A3 :
-                        (cmbStaticImageFormat.SelectedIndex == 1) ? iniEntry.TplFormat.RGBA8 : iniEntry.TplFormat.RGB565;
+                    if (!settings.sourceManage) tempEntry.source = (tbStaticImageSource.Text.StartsWith("\\")) ? tbStaticImageSource.Text : tbStaticImageSource.Text.Insert(0, "\\");
+                    if (!settings.autoImageSize) tempEntry.width = int.Parse(tbStaticImageWidth.Text);
+                    if (!settings.autoImageSize) tempEntry.height = int.Parse(tbStaticImageHeight.Text);
+
+                    if (cmbStaticImageFormat.SelectedIndex == 0) tempEntry.format = iniEntry.TplFormat.RGB5A3;
+                    else if (cmbStaticImageFormat.SelectedIndex == 1) tempEntry.format = iniEntry.TplFormat.RGBA8;
+                    else if (cmbStaticImageFormat.SelectedIndex == 2) tempEntry.format = iniEntry.TplFormat.RGB565;
+                    else if (cmbStaticImageFormat.SelectedIndex == 3) tempEntry.format = iniEntry.TplFormat.I4;
+                    else if (cmbStaticImageFormat.SelectedIndex == 4) tempEntry.format = iniEntry.TplFormat.I8;
+                    else if (cmbStaticImageFormat.SelectedIndex == 5) tempEntry.format = iniEntry.TplFormat.IA4;
+                    else if (cmbStaticImageFormat.SelectedIndex == 6) tempEntry.format = iniEntry.TplFormat.IA8;
 
                     tempEntry.filepath = tbStaticImageFilepath.Text;
                 }
@@ -332,7 +393,7 @@ namespace ThemeMii
                 else if (tempEntry.entryType == iniEntry.EntryType.StaticData)
                 {
                     tempEntry.file = (tbStaticDataFile.Text.StartsWith("\\")) ? tbStaticDataFile.Text : tbStaticDataFile.Text.Insert(0, "\\");
-                    if (!sourceManage) tempEntry.source = (tbStaticDataSource.Text.StartsWith("\\")) ? tbStaticDataSource.Text : tbStaticDataSource.Text.Insert(0, "\\");
+                    if (!settings.sourceManage) tempEntry.source = (tbStaticDataSource.Text.StartsWith("\\")) ? tbStaticDataSource.Text : tbStaticDataSource.Text.Insert(0, "\\");
 
                     tempEntry.filepath = tbStaticDataFilepath.Text;
                 }
@@ -382,14 +443,37 @@ namespace ThemeMii
             return highestIndex;
         }
 
-        private void CreateCsm(string appFile)
+        private void CreateCsm(string appFile, string nandBackupAppPath)
         {
             SaveSelected();
 
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "csm|*.csm";
+            if (string.IsNullOrEmpty(nandBackupAppPath))
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "csm|*.csm";
+                if (!string.IsNullOrEmpty(openedMym)) sfd.FileName = openedMym;
 
-            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    ReportProgress(0, "Collecting data...");
+
+                    List<object> lbEntries = new List<object>();
+
+                    foreach (object entry in lbxIniEntries.Items)
+                        lbEntries.Add(entry);
+
+                    CreationInfo cInfo = new CreationInfo();
+                    cInfo.savePath = sfd.FileName;
+                    cInfo.lbEntries = lbEntries.ToArray();
+                    cInfo.createCsm = true;
+                    cInfo.appFile = appFile;
+                    cInfo.closeAfter = false;
+
+                    Thread workerThread = new Thread(new ParameterizedThreadStart(this._saveMym));
+                    workerThread.Start(cInfo);
+                }
+            }
+            else
             {
                 ReportProgress(0, "Collecting data...");
 
@@ -399,17 +483,18 @@ namespace ThemeMii
                     lbEntries.Add(entry);
 
                 CreationInfo cInfo = new CreationInfo();
-                cInfo.savePath = sfd.FileName;
+                cInfo.savePath = nandBackupAppPath;
                 cInfo.lbEntries = lbEntries.ToArray();
                 cInfo.createCsm = true;
                 cInfo.appFile = appFile;
+                cInfo.closeAfter = false;
 
                 Thread workerThread = new Thread(new ParameterizedThreadStart(this._saveMym));
                 workerThread.Start(cInfo);
             }
         }
 
-        private void SaveMym()
+        private void SaveMym(bool exitAfter)
         {
             if (lbxIniEntries.Items.Count > 0)
             {
@@ -417,6 +502,7 @@ namespace ThemeMii
 
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.Filter = "mym|*.mym";
+                if (!string.IsNullOrEmpty(openedMym)) sfd.FileName = openedMym;
 
                 if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
@@ -431,6 +517,7 @@ namespace ThemeMii
                     cInfo.savePath = sfd.FileName;
                     cInfo.lbEntries = lbEntries.ToArray();
                     cInfo.createCsm = false;
+                    cInfo.closeAfter = exitAfter;
 
                     Thread workerThread = new Thread(new ParameterizedThreadStart(this._saveMym));
                     workerThread.Start(cInfo);
@@ -443,41 +530,41 @@ namespace ThemeMii
             if (entry.entryType == iniEntry.EntryType.Container)
             {
                 if (string.IsNullOrEmpty(entry.file) || entry.file.Length < 2)
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
             }
             else if (entry.entryType == iniEntry.EntryType.CustomImage)
             {
                 if (string.IsNullOrEmpty(entry.file) || entry.file.Length < 2)
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
                 if (string.IsNullOrEmpty(entry.name))
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"name\"...", entry.entry)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"name\"...", entry.entry)); return false; }
             }
             else if (entry.entryType == iniEntry.EntryType.StaticImage)
             {
                 if (string.IsNullOrEmpty(entry.file) || entry.file.Length < 2)
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
                 if (string.IsNullOrEmpty(entry.source))
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"source\"...", entry.entry)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"source\"...", entry.entry)); return false; }
 
                 if (!File.Exists(entry.filepath))
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nFile not found...\n\n{1}", entry.entry, entry.filepath)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nFile not found...\n\n{1}", entry.entry, entry.filepath)); return false; }
             }
             else if (entry.entryType == iniEntry.EntryType.CustomData)
             {
                 if (string.IsNullOrEmpty(entry.file) || entry.file.Length < 2)
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
                 if (string.IsNullOrEmpty(entry.name))
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"name\"...", entry.entry)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"name\"...", entry.entry)); return false; }
             }
             else if (entry.entryType == iniEntry.EntryType.StaticData)
             {
                 if (string.IsNullOrEmpty(entry.file) || entry.file.Length < 2)
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
                 if (string.IsNullOrEmpty(entry.source))
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"source\"...", entry.entry)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"source\"...", entry.entry)); return false; }
 
                 if (!File.Exists(entry.filepath))
-                { if (!ignoreMissing) ErrorBox(string.Format("Entry: {0}\nFile not found...\n\n{1}", entry.entry, entry.filepath)); return false; }
+                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nFile not found...\n\n{1}", entry.entry, entry.filepath)); return false; }
             }
 
             return true;
@@ -597,13 +684,19 @@ namespace ThemeMii
             BaseApp standardApp = GetStandardBaseApp();
             if (standardApp == (BaseApp)0) { ErrorBox("You have to choose a Standard System Menu!"); return; }
 
-            string browsePath = tempDir + "appBrowse\\";
+            string browsePath;
+            string altPath;
+            if (!settings.keepExtractedApp) { browsePath = tempDir + "appBrowse\\"; altPath = Application.StartupPath + "\\ExtractedBaseApp\\"; }
+            else { browsePath = Application.StartupPath + "\\ExtractedBaseApp\\"; altPath = tempDir + "appBrowse\\"; }
 
             if (standardApp != lastExtracted || !Directory.Exists(browsePath))
             {
                 //Extract app
                 if (!File.Exists(Application.StartupPath + "\\" + ((int)standardApp).ToString("x8") + ".app"))
                 { ErrorBox("app file wasn't found!"); return; }
+
+                if (Directory.Exists(browsePath)) Directory.Delete(browsePath, true);
+                if (Directory.Exists(altPath)) Directory.Delete(altPath, true);
 
                 Thread workerThread = new Thread(new ParameterizedThreadStart(this._extractAppForBrowsing));
                 workerThread.Start(new object[] { standardApp, browsePath });
@@ -617,9 +710,10 @@ namespace ThemeMii
 
             ThemeMii_AppBrowse appBrowser = new ThemeMii_AppBrowse();
             appBrowser.RootPath = browsePath;
-            appBrowser.ViewOnly = viewOnly;
-            appBrowser.ContainerBrowse = containerBrowse;
-            appBrowser.SelectedPath = selectedNode;
+            appBrowser.ViewOnly = browseInfo.viewOnly;
+            appBrowser.ContainerBrowse = browseInfo.containerBrowse;
+            appBrowser.SelectedPath = browseInfo.selectedNode;
+            appBrowser.OnlyTpls = browseInfo.onlyTpls;
 
             if (appBrowser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -634,6 +728,39 @@ namespace ThemeMii
         private bool StringExistsInStringArray(string theString, string[] theStringArray)
         {
             return Array.Exists(theStringArray, thisString => thisString.ToLower() == theString.ToLower());
+        }
+
+        private BaseApp GetBaseAppFromTitleVersion(int titleVersion)
+        {
+            switch (titleVersion)
+            {
+                case 288:
+                    return BaseApp.J32;
+                case 289:
+                    return BaseApp.U32;
+                case 290:
+                    return BaseApp.E32;
+                case 416:
+                    return BaseApp.J40;
+                case 417:
+                    return BaseApp.U40;
+                case 418:
+                    return BaseApp.E40;
+                case 448:
+                    return BaseApp.J41;
+                case 449:
+                    return BaseApp.U41;
+                case 450:
+                    return BaseApp.E41;
+                case 480:
+                    return BaseApp.J42;
+                case 481:
+                    return BaseApp.U42;
+                case 482:
+                    return BaseApp.E42;
+                default:
+                    return (BaseApp)0;
+            }
         }
     }
 }
