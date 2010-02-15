@@ -28,11 +28,13 @@ namespace ThemeMii
         private string selectedPath = string.Empty;
         private bool viewOnly = false;
         private bool containerBrowse = false;
+        private bool onlyTpls = false;
 
         public string RootPath { get { return rootPath; } set { rootPath = value; } }
         public string SelectedPath { get { return selectedPath; } set { selectedPath = value; } }
         public bool ViewOnly { get { return viewOnly; } set { viewOnly = value; } }
         public bool ContainerBrowse { get { return containerBrowse; } set { containerBrowse = value; } }
+        public bool OnlyTpls { get { return onlyTpls; } set { onlyTpls = value; } }
 
         public ThemeMii_AppBrowse()
         {
@@ -80,6 +82,8 @@ namespace ThemeMii
 
         private void btnOK_Click(object sender, EventArgs e)
         {
+            if (onlyTpls && !tvBrowse.SelectedNode.Name.ToLower().EndsWith(".tpl"))
+            { MessageBox.Show("Only TPLs are allowed for Static or Custom Images!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
             if (tvBrowse.SelectedNode == null) selectedPath = string.Empty;
             else selectedPath = tvBrowse.SelectedNode.FullPath.Remove(0, 4);
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
@@ -117,7 +121,7 @@ namespace ThemeMii
 
             foreach (FileInfo thisInfo in dInfo.GetFiles())
             {
-                if (!containerBrowse && thisInfo.Name.ToLower().EndsWith(".ash")) continue;
+                if (!containerBrowse && Directory.Exists(thisInfo.FullName.Replace(".", "_") + "_out")) continue;
 
                 TreeNode newNode = new TreeNode(thisInfo.Name);
                 newNode.ImageIndex = 1; newNode.SelectedImageIndex = 1;
@@ -168,7 +172,17 @@ namespace ThemeMii
 
                 if (nodePath.ToLower().EndsWith(".tpl"))
                     img = Wii.TPL.ConvertFromTPL(nodePath);
-                else img = Image.FromFile(nodePath);
+                else
+                {
+                    byte[] fourBytes = Wii.Tools.LoadFileToByteArray(nodePath, 0, 4);
+
+                    if (fourBytes[0] == 'L' && fourBytes[1] == 'Z' && fourBytes[2] == '7' && fourBytes[3] == '7')
+                    {
+                        byte[] imageFile = Wii.Lz77.Decompress(File.ReadAllBytes(nodePath), 0);
+                        img = Image.FromStream(new MemoryStream(imageFile));
+                    }
+                    else img = Image.FromFile(nodePath);
+                }
 
                 PictureBox pb = new PictureBox();
                 pb.Dock = DockStyle.Fill;
@@ -177,7 +191,7 @@ namespace ThemeMii
 
                 Form preview = new Form();
                 preview.Controls.Add(pb);
-                preview.Size = new Size((img.Width < 100) ? 150 : img.Width + 50, (img.Height < 100) ? 150 : img.Height + 50);
+                preview.Size = new Size((img.Width < 300) ? 350 : img.Width + 50, (img.Height < 300) ? 350 : img.Height + 50);
                 preview.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
                 preview.StartPosition = FormStartPosition.CenterParent;
 

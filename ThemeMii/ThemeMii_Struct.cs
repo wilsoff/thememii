@@ -17,12 +17,33 @@
 
 namespace ThemeMii
 {
+    public struct ThemeMiiSettings
+    {
+        public bool ignoreMissing;
+        public bool sourceManage;
+        public bool containerManage;
+        public bool autoImageSize;
+        public bool keepExtractedApp;
+        public bool lz77Containers;
+        public bool savePrompt;
+    }
+
+    public struct AppBrowseInfo
+    {
+        public bool viewOnly;
+        public bool containerBrowse;
+        public string selectedNode;
+        public bool onlyTpls;
+    }
+
     public struct CreationInfo
     {
         public string savePath;
         public object[] lbEntries;
         public bool createCsm;
+        public string nandBackupAppPath;
         public string appFile;
+        public bool closeAfter;
     }
 
     public enum BaseApp : int

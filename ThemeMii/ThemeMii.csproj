@@ -79,6 +79,12 @@
     <Compile Include="ThemeMii_CsmToMym.Designer.cs">
       <DependentUpon>ThemeMii_CsmToMym.cs</DependentUpon>
     </Compile>
+    <Compile Include="ThemeMii_Help.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ThemeMii_Help.Designer.cs">
+      <DependentUpon>ThemeMii_Help.cs</DependentUpon>
+    </Compile>
     <Compile Include="ThemeMii_Main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -112,6 +118,9 @@
     <EmbeddedResource Include="ThemeMii_CsmToMym.resx">
       <DependentUpon>ThemeMii_CsmToMym.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ThemeMii_Help.resx">
+      <DependentUpon>ThemeMii_Help.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ThemeMii_Main.resx">
       <DependentUpon>ThemeMii_Main.cs</DependentUpon>
     </EmbeddedResource>
@@ -129,6 +138,7 @@
   <ItemGroup>
     <Content Include="License.txt" />
     <Content Include="Readme.txt" />
+    <None Include="Resources\ThemeMiiBasics.rtf" />
     <None Include="Resources\ThemeMii_Icon.ico" />
     <None Include="Resources\ThemeMiiFull.png" />
   </ItemGroup>

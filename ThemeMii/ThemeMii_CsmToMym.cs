@@ -108,28 +108,137 @@ namespace ThemeMii
 
             if (intensiveAlgorithm)
             {
-                //string[] appFiles = Directory.GetFiles(appDir, "*", SearchOption.AllDirectories);
-
                 for (int i = 0; i < csmFiles.Length; i++)
                 {
                     ReportProgress((i * 100 / csmFiles.Length) / 2);
 
-                    if (Wii.U8.CheckU8(csmFiles[i]) && File.Exists(csmFiles[i].Replace(csmDir, appDir)))
+                    byte[] temp = Wii.Tools.LoadFileToByteArray(csmFiles[i], 0, 4);
+                    if (temp[0] == 'Y' && temp[1] == 'a' && temp[2] == 'z' && temp[3] == '0') continue;
+
+                    bool extracted = false;
+
+                    while (!extracted)
                     {
-                        byte[] temp = Wii.Tools.LoadFileToByteArray(csmFiles[i].Replace(csmDir, appDir), 0, 4);
-                        if (temp[0] == 'A' && temp[1] == 'S' && temp[2] == 'H' && temp[3] == '0')
+                        byte[] fourBytes = Wii.Tools.LoadFileToByteArray(csmFiles[i].Replace(csmDir, appDir), 0, 4);
+
+                        if (fourBytes[0] == 'A' && fourBytes[1] == 'S' &&
+                                fourBytes[2] == 'H' && fourBytes[3] == '0') //ASH0
                         {
-                            DeASH(csmFiles[i].Replace(csmDir, appDir));
-                            File.Delete(csmFiles[i].Replace(csmDir, appDir));
-                            FileInfo fi = new FileInfo(csmFiles[i].Replace(csmDir, appDir) + ".arc");
-                            fi.MoveTo(csmFiles[i].Replace(csmDir, appDir));
+                            try
+                            {
+                                DeASH(csmFiles[i].Replace(csmDir, appDir));
+
+                                File.Delete(csmFiles[i].Replace(csmDir, appDir));
+                                FileInfo fi = new FileInfo(csmFiles[i].Replace(csmDir, appDir) + ".arc");
+                                fi.MoveTo(csmFiles[i].Replace(csmDir, appDir));
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
                         }
+                        else if (fourBytes[0] == 'L' && fourBytes[1] == 'Z' &&
+                                fourBytes[2] == '7' && fourBytes[3] == '7') //Lz77
+                        {
+                            try
+                            {
+                                byte[] decompressedFile = Wii.Lz77.Decompress(File.ReadAllBytes(csmFiles[i].Replace(csmDir, appDir)), 0);
 
-                        Wii.U8.UnpackU8(csmFiles[i].Replace(csmDir, appDir), csmFiles[i].Replace(csmDir, appDir).Replace(".", "_") + "_out");
-                        Wii.U8.UnpackU8(csmFiles[i], csmFiles[i].Replace(".", "_") + "_out");
+                                File.Delete(csmFiles[i].Replace(csmDir, appDir));
+                                File.WriteAllBytes(csmFiles[i].Replace(csmDir, appDir), decompressedFile);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                        }
+                        else if (fourBytes[0] == 'Y' && fourBytes[1] == 'a' &&
+                                fourBytes[2] == 'z' && fourBytes[3] == '0') //Yaz0
+                        {
+                            //Nothing to do about yet...
+                            break;
+                        }
+                        else if (fourBytes[0] == 0x55 && fourBytes[1] == 0xaa &&
+                                fourBytes[2] == 0x38 && fourBytes[3] == 0x2d) //U8
+                        {
+                            try
+                            {
+                                Wii.U8.UnpackU8(csmFiles[i].Replace(csmDir, appDir), csmFiles[i].Replace(csmDir, appDir).Replace(".", "_") + "_out");
+                                File.Delete(csmFiles[i].Replace(csmDir, appDir));
+                                extracted = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                        }
+                        else break;
+                    }
 
-                        File.Delete(csmFiles[i].Replace(csmDir, appDir));
-                        File.Delete(csmFiles[i]);
+                    extracted = false;
+
+                    while (!extracted)
+                    {
+                        byte[] fourBytes = Wii.Tools.LoadFileToByteArray(csmFiles[i], 0, 4);
+
+                        if (fourBytes[0] == 'A' && fourBytes[1] == 'S' &&
+                                fourBytes[2] == 'H' && fourBytes[3] == '0') //ASH0
+                        {
+                            try
+                            {
+                                DeASH(csmFiles[i]);
+
+                                File.Delete(csmFiles[i]);
+                                FileInfo fi = new FileInfo(csmFiles[i] + ".arc");
+                                fi.MoveTo(csmFiles[i]);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                        }
+                        else if (fourBytes[0] == 'L' && fourBytes[1] == 'Z' &&
+                                fourBytes[2] == '7' && fourBytes[3] == '7') //Lz77
+                        {
+                            try
+                            {
+                                byte[] decompressedFile = Wii.Lz77.Decompress(File.ReadAllBytes(csmFiles[i]), 0);
+
+                                File.Delete(csmFiles[i]);
+                                File.WriteAllBytes(csmFiles[i], decompressedFile);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                        }
+                        else if (fourBytes[0] == 'Y' && fourBytes[1] == 'a' &&
+                                fourBytes[2] == 'z' && fourBytes[3] == '0') //Yaz0
+                        {
+                            //Nothing to do about yet...
+                            break;
+                        }
+                        else if (fourBytes[0] == 0x55 && fourBytes[1] == 0xaa &&
+                                fourBytes[2] == 0x38 && fourBytes[3] == 0x2d) //U8
+                        {
+                            try
+                            {
+                                Wii.U8.UnpackU8(csmFiles[i], csmFiles[i].Replace(".", "_") + "_out");
+                                File.Delete(csmFiles[i]);
+                                extracted = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                        }
+                        else break;
                     }
                 }
 
@@ -177,6 +286,56 @@ namespace ThemeMii
                 entryList.Add(tempEntry);
             }
 
+            //---
+
+            List<string> containersToManage = new List<string>();
+            List<string> managedContainers = new List<string>();
+
+            foreach (iniEntry tempEntry in entryList)
+            {
+                if (tempEntry.entryType == iniEntry.EntryType.Container)
+                    managedContainers.Add(tempEntry.file);
+                else
+                {
+                    if (tempEntry.file.Contains("_out"))
+                    {
+                        string tmpString = tempEntry.file.Remove(tempEntry.file.IndexOf("_out"));
+                        tmpString = tmpString.Substring(0, tmpString.Length - 5) + tmpString.Substring(tmpString.Length - 5).Replace("_", ".");
+
+                        if (!StringExistsInStringArray(tmpString, containersToManage.ToArray()))
+                            containersToManage.Add(tmpString);
+                    }
+                }
+            }
+
+            List<string> leftContainers = new List<string>();
+
+            foreach (string thisContainer in containersToManage)
+            {
+                if (!StringExistsInStringArray(thisContainer, managedContainers.ToArray()))
+                    leftContainers.Add(thisContainer);
+            }
+
+            if (leftContainers.Count > 0)
+            {
+                List<iniEntry> newList = new List<iniEntry>();
+
+                foreach (string thisContainer in leftContainers)
+                {
+                    iniEntry tempEntry = new iniEntry();
+                    tempEntry.entryType = iniEntry.EntryType.Container;
+                    tempEntry.file = thisContainer;
+                    tempEntry.type = iniEntry.ContainerType.ASH;
+
+                    newList.Add(tempEntry);
+                }
+
+                newList.AddRange(entryList);
+                entryList = newList;
+            }
+
+            //---
+
             mymini ini = mymini.CreateIni(entryList.ToArray());
             ini.Save(mymDir + "mym.ini");
 
@@ -202,6 +361,11 @@ namespace ThemeMii
             p.WaitForExit();
 
             //ErrorBox(p.StandardOutput.ReadToEnd() + "\n\n" + mymC.file);
+        }
+
+        private bool StringExistsInStringArray(string theString, string[] theStringArray)
+        {
+            return Array.Exists(theStringArray, thisString => thisString.ToLower() == theString.ToLower());
         }
 
         private void ReportProgress(int progressPercentage)

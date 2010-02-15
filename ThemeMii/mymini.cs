@@ -33,6 +33,10 @@ namespace ThemeMii
 
         public enum TplFormat
         {
+            I4 = 0,
+            I8 = 1,
+            IA4 = 2,
+            IA8 = 3,
             RGB5A3 = 5,
             RGB565 = 4,
             RGBA8 = 6
@@ -123,6 +127,8 @@ namespace ThemeMii
                     sb.AppendLine(string.Format("source={0}", tempEntry.source));
                     sb.AppendLine(string.Format("width={0}", tempEntry.width));
                     sb.AppendLine(string.Format("height={0}", tempEntry.height));
+                    if (tempEntry.format != iniEntry.TplFormat.RGB5A3)
+                        sb.AppendLine(string.Format("format={0}", tempEntry.format.ToString()));
                 }
                 else if (tempEntry.entryType == iniEntry.EntryType.CustomData)
                 {
@@ -276,6 +282,14 @@ namespace ThemeMii
                                 tempEntry.format = iniEntry.TplFormat.RGBA8;
                             else if (iniLines[j].Substring(7).ToUpper().StartsWith("RGB565"))
                                 tempEntry.format = iniEntry.TplFormat.RGB565;
+                            else if (iniLines[j].Substring(7).ToUpper() == "I4")
+                                tempEntry.format = iniEntry.TplFormat.I4;
+                            else if (iniLines[j].Substring(7).ToUpper() == "I8")
+                                tempEntry.format = iniEntry.TplFormat.I8;
+                            else if (iniLines[j].Substring(7).ToUpper() == "IA4")
+                                tempEntry.format = iniEntry.TplFormat.IA4;
+                            else if (iniLines[j].Substring(7).ToUpper() == "IA8")
+                                tempEntry.format = iniEntry.TplFormat.IA8;
                         }
 
                         j++;
@@ -330,6 +344,14 @@ namespace ThemeMii
                                 tempEntry.format = iniEntry.TplFormat.RGBA8;
                             else if (iniLines[j].Substring(7).ToUpper() == "RGB565")
                                 tempEntry.format = iniEntry.TplFormat.RGB565;
+                            else if (iniLines[j].Substring(7).ToUpper() == "I4")
+                                tempEntry.format = iniEntry.TplFormat.I4;
+                            else if (iniLines[j].Substring(7).ToUpper() == "I8")
+                                tempEntry.format = iniEntry.TplFormat.I8;
+                            else if (iniLines[j].Substring(7).ToUpper() == "IA4")
+                                tempEntry.format = iniEntry.TplFormat.IA4;
+                            else if (iniLines[j].Substring(7).ToUpper() == "IA8")
+                                tempEntry.format = iniEntry.TplFormat.IA8;
                         }
 
                         tempEntry.filepath = Path.GetDirectoryName(iniFile) + tempEntry.source;

@@ -61,7 +61,6 @@ namespace ThemeMii
             BaseApp standardApp = (BaseApp)(((object[])infos)[0]);
             string browsePath = (string)(((object[])infos)[1]);
 
-            if (Directory.Exists(browsePath)) Directory.Delete(browsePath, true);
             Directory.CreateDirectory(browsePath);
 
             Wii.U8.UnpackU8(Application.StartupPath + "\\" + ((int)standardApp).ToString("x8") + ".app", browsePath);
@@ -73,26 +72,69 @@ namespace ThemeMii
             {
                 ReportProgress(++counter * 100 / allFiles.Length, "Extracting App...");
 
-                if (thisFile.ToLower().EndsWith(".ash"))
+                bool extracted = false;
+
+                while (!extracted)
                 {
-                    //Is ASH file
                     byte[] fourBytes = Wii.Tools.LoadFileToByteArray(thisFile, 0, 4);
 
-                    if (fourBytes[0] == 'A' && fourBytes[1] == 'S' && fourBytes[2] == 'H' && fourBytes[3] == '0')
+                    if (fourBytes[0] == 'A' && fourBytes[1] == 'S' &&
+                            fourBytes[2] == 'H' && fourBytes[3] == '0') //ASH0
                     {
-                        //Is ASH0 compressed
                         try
                         {
                             DeASH(thisFile);
+
                             File.Delete(thisFile);
                             FileInfo fi = new FileInfo(thisFile + ".arc");
                             fi.MoveTo(thisFile);
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            SetControls(true);
+                            ErrorBox(ex.Message);
+                            return;
+                        }
                     }
+                    else if (fourBytes[0] == 'L' && fourBytes[1] == 'Z' &&
+                            fourBytes[2] == '7' && fourBytes[3] == '7') //Lz77
+                    {
+                        try
+                        {
+                            byte[] decompressedFile = Wii.Lz77.Decompress(File.ReadAllBytes(thisFile), 0);
 
-                    Wii.U8.UnpackU8(thisFile, thisFile.Replace(".", "_") + "_out");
-                    //File.Delete(thisFile);
+                            File.Delete(thisFile);
+                            File.WriteAllBytes(thisFile, decompressedFile);
+                        }
+                        catch (Exception ex)
+                        {
+                            SetControls(true);
+                            ErrorBox(ex.Message);
+                            return;
+                        }
+                    }
+                    else if (fourBytes[0] == 'Y' && fourBytes[1] == 'a' &&
+                            fourBytes[2] == 'z' && fourBytes[3] == '0') //Yaz0
+                    {
+                        //Nothing to do about yet...
+                        break;
+                    }
+                    else if (fourBytes[0] == 0x55 && fourBytes[1] == 0xaa &&
+                            fourBytes[2] == 0x38 && fourBytes[3] == 0x2d) //U8
+                    {
+                        try
+                        {
+                            Wii.U8.UnpackU8(thisFile, thisFile.Replace(".", "_") + "_out");
+                            extracted = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            SetControls(true);
+                            ErrorBox(ex.Message);
+                            return;
+                        }
+                    }
+                    else break;
                 }
             }
 
@@ -229,13 +271,16 @@ namespace ThemeMii
                     if (!File.Exists(appOut + tempEntry.file))
                         continue;
 
-                    if (tempEntry.type == iniEntry.ContainerType.ASH)
+                    bool extracted = false;
+
+                    while (!extracted)
                     {
-                        try
+                        byte[] fourBytes = Wii.Tools.LoadFileToByteArray(appOut + tempEntry.file, 0, 4);
+
+                        if (fourBytes[0] == 'A' && fourBytes[1] == 'S' &&
+                                fourBytes[2] == 'H' && fourBytes[3] == '0') //ASH0
                         {
-                            byte[] fourBytes = Wii.Tools.LoadFileToByteArray(appOut + tempEntry.file, 0, 4);
-                            if (fourBytes[0] == 'A' && fourBytes[1] == 'S' &&
-                                fourBytes[2] == 'H' && fourBytes[3] == '0')
+                            try
                             {
                                 DeASH(tempEntry, appOut);
 
@@ -243,28 +288,56 @@ namespace ThemeMii
                                 FileInfo fi = new FileInfo(appOut + tempEntry.file + ".arc");
                                 fi.MoveTo(appOut + tempEntry.file);
                             }
+                            catch
+                            {
+                                SetControls(true);
+                                ErrorBox("Entry: " + tempEntry.entry + "\n\nASH.exe returned an error!\nYou may try to decompress the ASH files manually...");
+                                return;
+                            }
                         }
-                        catch
+                        else if (fourBytes[0] == 'L' && fourBytes[1] == 'Z' &&
+                                fourBytes[2] == '7' && fourBytes[3] == '7') //Lz77
                         {
-                            SetControls(true);
-                            ErrorBox("Entry: " + tempEntry.entry + "\n\nASH.exe returned an error!\nYou may try to decompress the ASH files manually...");
-                            return;
-                        }
+                            try
+                            {
+                                byte[] decompressedFile = Wii.Lz77.Decompress(File.ReadAllBytes(appOut + tempEntry.file), 0);
 
-                        try
-                        {
-                            Wii.U8.UnpackU8(appOut + tempEntry.file, appOut + tempEntry.file.Replace('.', '_') + "_out");
-                            File.Delete(appOut + tempEntry.file);
+                                File.Delete(appOut + tempEntry.file);
+                                File.WriteAllBytes(appOut + tempEntry.file, decompressedFile);
+                            }
+                            catch (Exception ex)
+                            {
+                                SetControls(true);
+                                ErrorBox("Entry: " + tempEntry.entry + "\n\n" + ex.Message);
+                                return;
+                            }
                         }
-                        catch (Exception ex)
+                        else if (fourBytes[0] == 'Y' && fourBytes[1] == 'a' &&
+                                fourBytes[2] == 'z' && fourBytes[3] == '0') //Yaz0
                         {
-                            SetControls(true);
-                            ErrorBox("Entry: " + tempEntry.entry + "\n\n" + ex.Message);
-                            return;
+                            //Nothing to do about yet...
+                            break;
                         }
-
-                        editedContainers.Add(tempEntry);
+                        else if (fourBytes[0] == 0x55 && fourBytes[1] == 0xaa &&
+                                fourBytes[2] == 0x38 && fourBytes[3] == 0x2d) //U8
+                        {
+                            try
+                            {
+                                Wii.U8.UnpackU8(appOut + tempEntry.file, appOut + tempEntry.file.Replace('.', '_') + "_out");
+                                File.Delete(appOut + tempEntry.file);
+                                extracted = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                SetControls(true);
+                                ErrorBox("Entry: " + tempEntry.entry + "\n\n" + ex.Message);
+                                return;
+                            }
+                        }
+                        else break;
                     }
+
+                    editedContainers.Add(tempEntry);
                 }
                 else if (tempEntry.entryType == iniEntry.EntryType.CustomImage)
                 {
@@ -356,7 +429,17 @@ namespace ThemeMii
             //Repack Containers
             foreach (iniEntry tempEntry in editedContainers)
             {
-                Wii.U8.PackU8(appOut + tempEntry.file.Replace('.', '_') + "_out", appOut + tempEntry.file);
+                if (!settings.lz77Containers)
+                {
+                    Wii.U8.PackU8(appOut + tempEntry.file.Replace('.', '_') + "_out", appOut + tempEntry.file);
+                }
+                else
+                {
+                    byte[] u8Container = Wii.U8.PackU8(appOut + tempEntry.file.Replace('.', '_') + "_out");
+                    Wii.Lz77.Compress(u8Container, appOut + tempEntry.file);
+
+                }
+
                 Directory.Delete(appOut + tempEntry.file.Replace('.', '_') + "_out", true);
             }
 
@@ -411,7 +494,7 @@ namespace ThemeMii
                     iniEntry tempEntry = ini.GetEntry(tempObject.ToString());
                     if (!CheckEntry(tempEntry))
                     {
-                        if (!ignoreMissing) { ReportProgress(100, " "); SetControls(true); return; }
+                        if (!settings.ignoreMissing) { ReportProgress(100, " "); SetControls(true); return; }
                         else continue;
                     }
 
@@ -427,7 +510,7 @@ namespace ThemeMii
                     //else if (tempEntry.entryType == iniEntry.EntryType.StaticData)
                     //{ tempEntry.entry = string.Format("[sdta{0}]", ++counters[4]); }
 
-                    if (sourceManage)
+                    if (settings.sourceManage)
                     {
                         //Manage source
                         if (tempEntry.entryType == iniEntry.EntryType.StaticData)
@@ -461,7 +544,7 @@ namespace ThemeMii
                             imageSources.Add(new string[] { tempEntry.source, fi.Length.ToString() });
                         }
                     }
-                    if (autoImageSize)
+                    if (settings.autoImageSize)
                     {
                         if (tempEntry.entryType == iniEntry.EntryType.CustomImage ||
                             tempEntry.entryType == iniEntry.EntryType.StaticImage)
@@ -485,7 +568,7 @@ namespace ThemeMii
             }
 
             //Manage Containers
-            if (containerManage)
+            if (settings.containerManage)
             {
                 List<string> containersToManage = new List<string>();
                 List<string> managedContainers = new List<string>();
@@ -562,6 +645,7 @@ namespace ThemeMii
             fZip.CreateZip((cInfo.createCsm) ? tempDir + "temp.mym" : cInfo.savePath, outDir, true, "");
             ReportProgress(100, " ");
 
+            if (cInfo.closeAfter) { MethodInvoker m = new MethodInvoker(this.ExitApplication); this.Invoke(m); return; }
             if (!cInfo.createCsm) { InfoBox("Saved mym to:\n" + cInfo.savePath); SetControls(true); return; }
 
             _createCsm(cInfo.savePath, cInfo.appFile, tempDir + "temp.mym");
@@ -589,6 +673,8 @@ namespace ThemeMii
             }
             catch (Exception ex) { ErrorBox(ex.Message); return; }
 
+            openedMym = Path.GetFileNameWithoutExtension((string)mymFile);
+
             //Add entries
             MethodInvoker m = new MethodInvoker(this.AddEntries);
             this.Invoke(m);
@@ -607,19 +693,7 @@ namespace ThemeMii
 
         private void _setControlsFalse()
         {
-            foreach (Control thisControl in this.Controls)
-            {
-                if (thisControl is Button) ((Button)thisControl).Enabled = false;
-                else if (thisControl is TextBox) ((TextBox)thisControl).Enabled = false;
-                else if (thisControl is Panel)
-                {
-                    foreach (Control thatControl in ((Panel)thisControl).Controls)
-                    {
-                        if (thisControl is Button) ((Button)thisControl).Enabled = false;
-                        else if (thisControl is TextBox) ((TextBox)thisControl).Enabled = false;
-                    }
-                }
-            }
+            SetControlsRecursive(this, false);
 
             foreach (object tsItem in msList.DropDownItems)
             {
@@ -627,23 +701,12 @@ namespace ThemeMii
             }
 
             msSave.Enabled = false;
+            msInstallToNandBackup.Enabled = false;
         }
 
         private void _setControlsTrue()
         {
-            foreach (Control thisControl in this.Controls)
-            {
-                if (thisControl is Button) ((Button)thisControl).Enabled = true;
-                else if (thisControl is TextBox) ((TextBox)thisControl).Enabled = true;
-                else if (thisControl is Panel)
-                {
-                    foreach (Control thatControl in ((Panel)thisControl).Controls)
-                    {
-                        if (thisControl is Button) ((Button)thisControl).Enabled = true;
-                        else if (thisControl is TextBox) ((TextBox)thisControl).Enabled = true;
-                    }
-                }
-            }
+            SetControlsRecursive(this, true);
 
             foreach (object tsItem in msList.DropDownItems)
             {
@@ -651,6 +714,7 @@ namespace ThemeMii
             }
 
             msSave.Enabled = true;
+            msInstallToNandBackup.Enabled = true;
         }
 
         private delegate void _progressReporter(ProgressChangedEventArgs e);
