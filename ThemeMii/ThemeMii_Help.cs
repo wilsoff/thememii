@@ -21,6 +21,10 @@ namespace ThemeMii
 {
     public partial class ThemeMii_Help : Form
     {
+        private bool tutorial = false;
+
+        public bool Tutorial { get { return tutorial; } set { tutorial = value; } }
+
         public ThemeMii_Help()
         {
             InitializeComponent();
@@ -29,7 +33,9 @@ namespace ThemeMii
 
         private void ThemeMii_Help_Load(object sender, System.EventArgs e)
         {
-            rtbBasicInstructions.Rtf = Properties.Resources.ThemeMiiBasics;
+            if (tutorial) rtbBasicInstructions.Rtf = Properties.Resources.HealthTut;
+            else rtbBasicInstructions.Rtf = Properties.Resources.ThemeMiiBasics;
+
             CenterToParent();
         }
     }

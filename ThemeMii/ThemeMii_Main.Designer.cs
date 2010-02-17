@@ -47,6 +47,7 @@ namespace ThemeMii
         {
             this.lbxIniEntries = new System.Windows.Forms.ListBox();
             this.panContainer = new System.Windows.Forms.Panel();
+            this.lbContainerInfo = new System.Windows.Forms.Label();
             this.btnContainerBrowseFile = new System.Windows.Forms.Button();
             this.lbCont = new System.Windows.Forms.Label();
             this.cmbContainerFormat = new System.Windows.Forms.ComboBox();
@@ -108,10 +109,13 @@ namespace ThemeMii
             this.msOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.msSourceManage = new System.Windows.Forms.ToolStripMenuItem();
             this.msContainerManage = new System.Windows.Forms.ToolStripMenuItem();
-            this.msImageSizeFromPng = new System.Windows.Forms.ToolStripMenuItem();
             this.msIgnoreMissingEntries = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.msImageSizeFromTpl = new System.Windows.Forms.ToolStripMenuItem();
+            this.msImageSizeFromPng = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.msLz77Containers = new System.Windows.Forms.ToolStripMenuItem();
+            this.msSaveNandPath = new System.Windows.Forms.ToolStripMenuItem();
             this.msKeepExtractedApp = new System.Windows.Forms.ToolStripMenuItem();
             this.msSavePrompt = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -132,6 +136,7 @@ namespace ThemeMii
             this.ms42J = new System.Windows.Forms.ToolStripMenuItem();
             this.ms42U = new System.Windows.Forms.ToolStripMenuItem();
             this.ms42E = new System.Windows.Forms.ToolStripMenuItem();
+            this.msChangeNandPath = new System.Windows.Forms.ToolStripMenuItem();
             this.msTools = new System.Windows.Forms.ToolStripMenuItem();
             this.msCsmToMym = new System.Windows.Forms.ToolStripMenuItem();
             this.msBrowseBaseApp = new System.Windows.Forms.ToolStripMenuItem();
@@ -192,7 +197,7 @@ namespace ThemeMii
             this.panList = new System.Windows.Forms.Panel();
             this.panButtons = new System.Windows.Forms.Panel();
             this.panPanels = new System.Windows.Forms.Panel();
-            this.lbContainerInfo = new System.Windows.Forms.Label();
+            this.msHealthTutorial = new System.Windows.Forms.ToolStripMenuItem();
             this.panContainer.SuspendLayout();
             this.panCustomImage.SuspendLayout();
             this.panStaticImage.SuspendLayout();
@@ -208,6 +213,7 @@ namespace ThemeMii
             // 
             // lbxIniEntries
             // 
+            this.lbxIniEntries.AllowDrop = true;
             this.lbxIniEntries.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)));
             this.lbxIniEntries.FormattingEnabled = true;
@@ -216,9 +222,12 @@ namespace ThemeMii
             this.lbxIniEntries.Size = new System.Drawing.Size(127, 277);
             this.lbxIniEntries.TabIndex = 0;
             this.lbxIniEntries.SelectedIndexChanged += new System.EventHandler(this.lbxIniEntrys_SelectedIndexChanged);
+            this.lbxIniEntries.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.lbxIniEntries.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // panContainer
             // 
+            this.panContainer.AllowDrop = true;
             this.panContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -235,6 +244,20 @@ namespace ThemeMii
             this.panContainer.Size = new System.Drawing.Size(224, 303);
             this.panContainer.TabIndex = 1;
             this.panContainer.Visible = false;
+            this.panContainer.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.panContainer.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
+            // 
+            // lbContainerInfo
+            // 
+            this.lbContainerInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbContainerInfo.Location = new System.Drawing.Point(13, 109);
+            this.lbContainerInfo.Name = "lbContainerInfo";
+            this.lbContainerInfo.Size = new System.Drawing.Size(189, 48);
+            this.lbContainerInfo.TabIndex = 11;
+            this.lbContainerInfo.Text = "Type is obsolete for ThemeMii, as it will automatically check each container for " +
+                "compression.";
+            this.lbContainerInfo.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // btnContainerBrowseFile
             // 
@@ -301,6 +324,7 @@ namespace ThemeMii
             // 
             // panCustomImage
             // 
+            this.panCustomImage.AllowDrop = true;
             this.panCustomImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -322,6 +346,8 @@ namespace ThemeMii
             this.panCustomImage.Size = new System.Drawing.Size(224, 303);
             this.panCustomImage.TabIndex = 5;
             this.panCustomImage.Visible = false;
+            this.panCustomImage.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.panCustomImage.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // btnCustomImageBrowseFile
             // 
@@ -449,6 +475,7 @@ namespace ThemeMii
             // 
             // panStaticImage
             // 
+            this.panStaticImage.AllowDrop = true;
             this.panStaticImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -473,6 +500,8 @@ namespace ThemeMii
             this.panStaticImage.Size = new System.Drawing.Size(224, 303);
             this.panStaticImage.TabIndex = 6;
             this.panStaticImage.Visible = false;
+            this.panStaticImage.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.panStaticImage.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // btnStaticImageBrowseFile
             // 
@@ -652,6 +681,7 @@ namespace ThemeMii
             // 
             // msMain
             // 
+            this.msMain.AllowDrop = true;
             this.msMain.BackColor = System.Drawing.SystemColors.Control;
             this.msMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.msFile,
@@ -664,6 +694,8 @@ namespace ThemeMii
             this.msMain.Size = new System.Drawing.Size(382, 24);
             this.msMain.TabIndex = 3;
             this.msMain.Text = "menuStrip1";
+            this.msMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.msMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // msFile
             // 
@@ -832,14 +864,18 @@ namespace ThemeMii
             this.msOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.msSourceManage,
             this.msContainerManage,
-            this.msImageSizeFromPng,
             this.msIgnoreMissingEntries,
+            this.toolStripSeparator6,
+            this.msImageSizeFromTpl,
+            this.msImageSizeFromPng,
             this.toolStripSeparator4,
             this.msLz77Containers,
+            this.msSaveNandPath,
             this.msKeepExtractedApp,
             this.msSavePrompt,
             this.toolStripSeparator2,
-            this.msStandardSysMenu});
+            this.msStandardSysMenu,
+            this.msChangeNandPath});
             this.msOptions.Name = "msOptions";
             this.msOptions.Size = new System.Drawing.Size(61, 20);
             this.msOptions.Text = "Options";
@@ -848,7 +884,7 @@ namespace ThemeMii
             // 
             this.msSourceManage.CheckOnClick = true;
             this.msSourceManage.Name = "msSourceManage";
-            this.msSourceManage.Size = new System.Drawing.Size(213, 22);
+            this.msSourceManage.Size = new System.Drawing.Size(216, 22);
             this.msSourceManage.Text = "Auto-Source-Manage";
             this.msSourceManage.Click += new System.EventHandler(this.msAutoManage_Click);
             // 
@@ -856,44 +892,65 @@ namespace ThemeMii
             // 
             this.msContainerManage.CheckOnClick = true;
             this.msContainerManage.Name = "msContainerManage";
-            this.msContainerManage.Size = new System.Drawing.Size(213, 22);
+            this.msContainerManage.Size = new System.Drawing.Size(216, 22);
             this.msContainerManage.Text = "Auto-Container-Manage";
             this.msContainerManage.Click += new System.EventHandler(this.msContainerManage_Click);
-            // 
-            // msImageSizeFromPng
-            // 
-            this.msImageSizeFromPng.CheckOnClick = true;
-            this.msImageSizeFromPng.Name = "msImageSizeFromPng";
-            this.msImageSizeFromPng.Size = new System.Drawing.Size(213, 22);
-            this.msImageSizeFromPng.Text = "Image Size from PNG";
-            this.msImageSizeFromPng.Click += new System.EventHandler(this.msImageSizeFromPng_Click);
             // 
             // msIgnoreMissingEntries
             // 
             this.msIgnoreMissingEntries.CheckOnClick = true;
             this.msIgnoreMissingEntries.Name = "msIgnoreMissingEntries";
-            this.msIgnoreMissingEntries.Size = new System.Drawing.Size(213, 22);
+            this.msIgnoreMissingEntries.Size = new System.Drawing.Size(216, 22);
             this.msIgnoreMissingEntries.Text = "Ignore Missing Entries";
             this.msIgnoreMissingEntries.Click += new System.EventHandler(this.msIgnoreMissingEntries_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(213, 6);
+            // 
+            // msImageSizeFromTpl
+            // 
+            this.msImageSizeFromTpl.CheckOnClick = true;
+            this.msImageSizeFromTpl.Name = "msImageSizeFromTpl";
+            this.msImageSizeFromTpl.Size = new System.Drawing.Size(216, 22);
+            this.msImageSizeFromTpl.Text = "Image Size from TPL";
+            this.msImageSizeFromTpl.Click += new System.EventHandler(this.msImageSizeFromTpl_Click);
+            // 
+            // msImageSizeFromPng
+            // 
+            this.msImageSizeFromPng.CheckOnClick = true;
+            this.msImageSizeFromPng.Name = "msImageSizeFromPng";
+            this.msImageSizeFromPng.Size = new System.Drawing.Size(216, 22);
+            this.msImageSizeFromPng.Text = "Image Size from PNG";
+            this.msImageSizeFromPng.Click += new System.EventHandler(this.msImageSizeFromPng_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(210, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(213, 6);
             // 
             // msLz77Containers
             // 
             this.msLz77Containers.CheckOnClick = true;
             this.msLz77Containers.Name = "msLz77Containers";
-            this.msLz77Containers.Size = new System.Drawing.Size(213, 22);
+            this.msLz77Containers.Size = new System.Drawing.Size(216, 22);
             this.msLz77Containers.Text = "Lz77 Compress Containers";
             this.msLz77Containers.Click += new System.EventHandler(this.msLz77Containers_Click);
+            // 
+            // msSaveNandPath
+            // 
+            this.msSaveNandPath.CheckOnClick = true;
+            this.msSaveNandPath.Name = "msSaveNandPath";
+            this.msSaveNandPath.Size = new System.Drawing.Size(216, 22);
+            this.msSaveNandPath.Text = "Save Nand Backup Path";
+            this.msSaveNandPath.Click += new System.EventHandler(this.msSaveNandPath_Click);
             // 
             // msKeepExtractedApp
             // 
             this.msKeepExtractedApp.CheckOnClick = true;
             this.msKeepExtractedApp.Name = "msKeepExtractedApp";
-            this.msKeepExtractedApp.Size = new System.Drawing.Size(213, 22);
+            this.msKeepExtractedApp.Size = new System.Drawing.Size(216, 22);
             this.msKeepExtractedApp.Text = "Keep Extracted Base App";
             this.msKeepExtractedApp.Click += new System.EventHandler(this.msKeepExtractedApp_Click);
             // 
@@ -901,14 +958,14 @@ namespace ThemeMii
             // 
             this.msSavePrompt.CheckOnClick = true;
             this.msSavePrompt.Name = "msSavePrompt";
-            this.msSavePrompt.Size = new System.Drawing.Size(213, 22);
+            this.msSavePrompt.Size = new System.Drawing.Size(216, 22);
             this.msSavePrompt.Text = "Save Prompt when Exiting";
             this.msSavePrompt.Click += new System.EventHandler(this.msSavePrompt_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(210, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(213, 6);
             // 
             // msStandardSysMenu
             // 
@@ -918,7 +975,7 @@ namespace ThemeMii
             this.ms41,
             this.ms42});
             this.msStandardSysMenu.Name = "msStandardSysMenu";
-            this.msStandardSysMenu.Size = new System.Drawing.Size(213, 22);
+            this.msStandardSysMenu.Size = new System.Drawing.Size(216, 22);
             this.msStandardSysMenu.Text = "Standard System Menu";
             // 
             // ms32
@@ -1056,6 +1113,13 @@ namespace ThemeMii
             this.ms42E.Size = new System.Drawing.Size(111, 22);
             this.ms42E.Text = "Europe";
             this.ms42E.Click += new System.EventHandler(this.StandardSysMenu_Click);
+            // 
+            // msChangeNandPath
+            // 
+            this.msChangeNandPath.Name = "msChangeNandPath";
+            this.msChangeNandPath.Size = new System.Drawing.Size(216, 22);
+            this.msChangeNandPath.Text = "Change Nand Backup Path";
+            this.msChangeNandPath.Click += new System.EventHandler(this.msChangeNandPath_Click);
             // 
             // msTools
             // 
@@ -1234,6 +1298,7 @@ namespace ThemeMii
             // 
             this.msQuestion.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.msHelp,
+            this.msHealthTutorial,
             this.toolStripSeparator5,
             this.msAbout});
             this.msQuestion.Name = "msQuestion";
@@ -1244,19 +1309,19 @@ namespace ThemeMii
             // 
             this.msHelp.Name = "msHelp";
             this.msHelp.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.msHelp.Size = new System.Drawing.Size(118, 22);
+            this.msHelp.Size = new System.Drawing.Size(191, 22);
             this.msHelp.Text = "Help";
             this.msHelp.Click += new System.EventHandler(this.msHelp_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(115, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(188, 6);
             // 
             // msAbout
             // 
             this.msAbout.Name = "msAbout";
-            this.msAbout.Size = new System.Drawing.Size(118, 22);
+            this.msAbout.Size = new System.Drawing.Size(191, 22);
             this.msAbout.Text = "About";
             this.msAbout.Click += new System.EventHandler(this.msAbout_Click);
             // 
@@ -1284,6 +1349,7 @@ namespace ThemeMii
             // 
             // panCustomData
             // 
+            this.panCustomData.AllowDrop = true;
             this.panCustomData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -1299,6 +1365,8 @@ namespace ThemeMii
             this.panCustomData.Size = new System.Drawing.Size(224, 303);
             this.panCustomData.TabIndex = 7;
             this.panCustomData.Visible = false;
+            this.panCustomData.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.panCustomData.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // btnCustomDataBrowseFile
             // 
@@ -1360,6 +1428,7 @@ namespace ThemeMii
             // 
             // panStaticData
             // 
+            this.panStaticData.AllowDrop = true;
             this.panStaticData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -1378,6 +1447,8 @@ namespace ThemeMii
             this.panStaticData.Size = new System.Drawing.Size(224, 303);
             this.panStaticData.TabIndex = 8;
             this.panStaticData.Visible = false;
+            this.panStaticData.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.panStaticData.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // btnStaticDataBrowseFile
             // 
@@ -1469,6 +1540,7 @@ namespace ThemeMii
             // 
             // panEmpty
             // 
+            this.panEmpty.AllowDrop = true;
             this.panEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -1477,9 +1549,12 @@ namespace ThemeMii
             this.panEmpty.Name = "panEmpty";
             this.panEmpty.Size = new System.Drawing.Size(224, 303);
             this.panEmpty.TabIndex = 9;
+            this.panEmpty.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.panEmpty.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // ssStatus
             // 
+            this.ssStatus.AllowDrop = true;
             this.ssStatus.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.pbProgress,
             this.lbStatus});
@@ -1490,6 +1565,8 @@ namespace ThemeMii
             this.ssStatus.SizingGrip = false;
             this.ssStatus.TabIndex = 10;
             this.ssStatus.Text = "statusStrip1";
+            this.ssStatus.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.ssStatus.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // pbProgress
             // 
@@ -1505,6 +1582,7 @@ namespace ThemeMii
             // 
             // btnSaveMym
             // 
+            this.btnSaveMym.AllowDrop = true;
             this.btnSaveMym.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.btnSaveMym.AutoSize = true;
             this.btnSaveMym.Location = new System.Drawing.Point(4, 7);
@@ -1514,9 +1592,12 @@ namespace ThemeMii
             this.btnSaveMym.Text = "Save mym";
             this.btnSaveMym.UseVisualStyleBackColor = true;
             this.btnSaveMym.Click += new System.EventHandler(this.msSave_Click);
+            this.btnSaveMym.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.btnSaveMym.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // btnCreateCsm
             // 
+            this.btnCreateCsm.AllowDrop = true;
             this.btnCreateCsm.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.btnCreateCsm.AutoSize = true;
             this.btnCreateCsm.Location = new System.Drawing.Point(197, 7);
@@ -1526,6 +1607,8 @@ namespace ThemeMii
             this.btnCreateCsm.Text = "Create csm";
             this.btnCreateCsm.UseVisualStyleBackColor = true;
             this.btnCreateCsm.Click += new System.EventHandler(this.btnCreateCsm_Click);
+            this.btnCreateCsm.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.btnCreateCsm.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // cmAdd
             // 
@@ -1575,6 +1658,7 @@ namespace ThemeMii
             // 
             // panList
             // 
+            this.panList.AllowDrop = true;
             this.panList.Controls.Add(this.lbxIniEntries);
             this.panList.Controls.Add(this.btnDown);
             this.panList.Controls.Add(this.btnUp);
@@ -1585,9 +1669,12 @@ namespace ThemeMii
             this.panList.Name = "panList";
             this.panList.Size = new System.Drawing.Size(141, 314);
             this.panList.TabIndex = 12;
+            this.panList.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.panList.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // panButtons
             // 
+            this.panButtons.AllowDrop = true;
             this.panButtons.Controls.Add(this.btnCreateCsm);
             this.panButtons.Controls.Add(this.btnSaveMym);
             this.panButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -1595,9 +1682,12 @@ namespace ThemeMii
             this.panButtons.Name = "panButtons";
             this.panButtons.Size = new System.Drawing.Size(382, 35);
             this.panButtons.TabIndex = 13;
+            this.panButtons.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.panButtons.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
             // panPanels
             // 
+            this.panPanels.AllowDrop = true;
             this.panPanels.Controls.Add(this.panStaticData);
             this.panPanels.Controls.Add(this.panCustomData);
             this.panPanels.Controls.Add(this.panStaticImage);
@@ -1609,21 +1699,19 @@ namespace ThemeMii
             this.panPanels.Name = "panPanels";
             this.panPanels.Size = new System.Drawing.Size(241, 314);
             this.panPanels.TabIndex = 14;
+            this.panPanels.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.panPanels.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             // 
-            // lbContainerInfo
+            // msHealthTutorial
             // 
-            this.lbContainerInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbContainerInfo.Location = new System.Drawing.Point(13, 109);
-            this.lbContainerInfo.Name = "lbContainerInfo";
-            this.lbContainerInfo.Size = new System.Drawing.Size(189, 48);
-            this.lbContainerInfo.TabIndex = 11;
-            this.lbContainerInfo.Text = "Type is obsolete for ThemeMii, as it will automatically check each container for " +
-                "compression.";
-            this.lbContainerInfo.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.msHealthTutorial.Name = "msHealthTutorial";
+            this.msHealthTutorial.Size = new System.Drawing.Size(191, 22);
+            this.msHealthTutorial.Text = "Health Screen Tutorial";
+            this.msHealthTutorial.Click += new System.EventHandler(this.msHealthTutorial_Click);
             // 
             // ThemeMii_Main
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(382, 395);
@@ -1638,6 +1726,10 @@ namespace ThemeMii
             this.Text = "ThemeMii X by Leathl";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ThemeMii_Main_FormClosing);
             this.Load += new System.EventHandler(this.ThemeMii_Main_Load);
+            this.ResizeEnd += new System.EventHandler(this.ThemeMii_Main_ResizeEnd);
+            this.LocationChanged += new System.EventHandler(this.ThemeMii_Main_LocationChanged);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.ThemeMii_Main_DragEnter);
             this.panContainer.ResumeLayout(false);
             this.panContainer.PerformLayout();
             this.panCustomImage.ResumeLayout(false);
@@ -1812,5 +1904,10 @@ namespace ThemeMii
         private System.Windows.Forms.ToolStripMenuItem msInstallToNandBackup;
         private System.Windows.Forms.ToolStripMenuItem msSavePrompt;
         private System.Windows.Forms.Label lbContainerInfo;
+        private System.Windows.Forms.ToolStripMenuItem msSaveNandPath;
+        private System.Windows.Forms.ToolStripMenuItem msChangeNandPath;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem msImageSizeFromTpl;
+        private System.Windows.Forms.ToolStripMenuItem msHealthTutorial;
     }
 }

@@ -9,6 +9,17 @@ Please report bugs and make suggestions at the issue tracker there.
 Changelog:
 ----------
 
+Version 0.3
+	- Added a little tutorial on how to change the health screen (in the ?-menu)
+	- Added ability to drag a mym file onto the window to open it
+	- Window location and size will now be saved
+	- Added option to save the nand backup path
+	- Added option to take image width and height from the selected TPL
+	- Fixed some bugs when saving/creating mym
+	- Fixed "No Entries Left" error when files have no extension
+	- Fixed base app downloading to different locations than the app directory
+	- Fixed base app browsing
+
 Version 0.2
 	- Made the window resizable
 	- Added some basic instructions "? -> Help"

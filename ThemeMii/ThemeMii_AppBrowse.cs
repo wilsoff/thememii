@@ -32,6 +32,7 @@ namespace ThemeMii
 
         public string RootPath { get { return rootPath; } set { rootPath = value; } }
         public string SelectedPath { get { return selectedPath; } set { selectedPath = value; } }
+        public string FullPath { get { return rootPath + selectedPath; } }
         public bool ViewOnly { get { return viewOnly; } set { viewOnly = value; } }
         public bool ContainerBrowse { get { return containerBrowse; } set { containerBrowse = value; } }
         public bool OnlyTpls { get { return onlyTpls; } set { onlyTpls = value; } }
@@ -82,8 +83,14 @@ namespace ThemeMii
 
         private void btnOK_Click(object sender, EventArgs e)
         {
+            if (tvBrowse.SelectedNode.Nodes.Count > 0) { tvBrowse.Select(); return; }
+
             if (onlyTpls && !tvBrowse.SelectedNode.Name.ToLower().EndsWith(".tpl"))
-            { MessageBox.Show("Only TPLs are allowed for Static or Custom Images!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); return; }
+            {
+                MessageBox.Show("Only TPLs are allowed for Static or Custom Images!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                tvBrowse.Select(); return;
+            }
+
             if (tvBrowse.SelectedNode == null) selectedPath = string.Empty;
             else selectedPath = tvBrowse.SelectedNode.FullPath.Remove(0, 4);
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
@@ -121,7 +128,7 @@ namespace ThemeMii
 
             foreach (FileInfo thisInfo in dInfo.GetFiles())
             {
-                if (!containerBrowse && Directory.Exists(thisInfo.FullName.Replace(".", "_") + "_out")) continue;
+                if (!containerBrowse && Directory.Exists(Path.GetDirectoryName(thisInfo.FullName) + "\\" + Path.GetFileName(thisInfo.FullName).Replace(".", "_") + "_out")) continue;
 
                 TreeNode newNode = new TreeNode(thisInfo.Name);
                 newNode.ImageIndex = 1; newNode.SelectedImageIndex = 1;
