@@ -129,6 +129,7 @@ namespace ThemeMii
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.tvBrowse);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "ThemeMii_AppBrowse";
             this.Text = "Browse Base App";
             this.Load += new System.EventHandler(this.ThemeMii_AppBrowse_Load);

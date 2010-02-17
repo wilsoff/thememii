@@ -29,17 +29,21 @@ namespace ThemeMii
         [STAThread]
         static void Main()
         {
-            if (File.Exists("ash.exe"))
-            {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new ThemeMii_Main());
-            }
-            else
+            if (!File.Exists("ash.exe"))
             {
                 MessageBox.Show("ASH.exe couldn't be found in the application directory...", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Environment.Exit(-1);
             }
+
+            if (!File.Exists("ICSharpCode.SharpZipLib.dll"))
+            {
+                MessageBox.Show("ICSharpCode.SharpZipLib.dll couldn't be found in the application directory...", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(-1);
+            }
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new ThemeMii_Main());
         }
     }
 }

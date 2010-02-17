@@ -138,6 +138,7 @@
   <ItemGroup>
     <Content Include="License.txt" />
     <Content Include="Readme.txt" />
+    <None Include="Resources\HealthTut.rtf" />
     <None Include="Resources\ThemeMiiBasics.rtf" />
     <None Include="Resources\ThemeMii_Icon.ico" />
     <None Include="Resources\ThemeMiiFull.png" />

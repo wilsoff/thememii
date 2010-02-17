@@ -124,7 +124,7 @@ namespace ThemeMii
                     {
                         try
                         {
-                            Wii.U8.UnpackU8(thisFile, thisFile.Replace(".", "_") + "_out");
+                            Wii.U8.UnpackU8(thisFile, Path.GetDirectoryName(thisFile) + "\\" + Path.GetFileName(thisFile).Replace(".", "_") + "_out");
                             extracted = true;
                         }
                         catch (Exception ex)
@@ -147,7 +147,6 @@ namespace ThemeMii
 
         private void _downloadBaseApp(object _infos)
         {
-            SetControls(false);
             string[] infos = _infos as string[];
             string nusUrl = "http://nus.cdn.shop.wii.com/ccs/download";
             string _tempDir = tempDir + "nusTemp\\";
@@ -192,7 +191,7 @@ namespace ThemeMii
             //Gather information
             ReportProgress(80, "Gathering Data...");
             byte[] encTitleKey = Wii.Tools.GetPartOfByteArray(File.ReadAllBytes(_tempDir + "cetk"), 447, 16);
-            byte[] commonkey = File.ReadAllBytes("common-key.bin");
+            byte[] commonkey = File.ReadAllBytes(Application.StartupPath + "\\common-key.bin");
             byte[] decTitleKey = Wii.WadEdit.GetTitleKey(encTitleKey, Wii.Tools.HexStringToByteArray(titleID));
 
             int contentIndex = -1;
@@ -228,7 +227,6 @@ namespace ThemeMii
             Directory.Delete(_tempDir, true);
 
             ReportProgress(100, " ");
-            SetControls(true);
             InfoBox(string.Format("Downloaded base app to:\n{0}", infos[2]));
         }
 
@@ -498,35 +496,41 @@ namespace ThemeMii
                         else continue;
                     }
 
-                    //New order... (Not needed anymore, will be made while creating the ini!)
-                    //if (tempEntry.entryType == iniEntry.EntryType.Container)
-                    //{ tempEntry.entry = string.Format("[cont{0}]", ++counters[0]); }
-                    //else if (tempEntry.entryType == iniEntry.EntryType.CustomImage)
-                    //{ tempEntry.entry = string.Format("[cimg{0}]", ++counters[1]); }
-                    //else if (tempEntry.entryType == iniEntry.EntryType.StaticImage)
-                    //{ tempEntry.entry = string.Format("[simg{0}]", ++counters[2]); }
-                    //else if (tempEntry.entryType == iniEntry.EntryType.CustomData)
-                    //{ tempEntry.entry = string.Format("[cdta{0}]", ++counters[3]); }
-                    //else if (tempEntry.entryType == iniEntry.EntryType.StaticData)
-                    //{ tempEntry.entry = string.Format("[sdta{0}]", ++counters[4]); }
-
                     if (settings.sourceManage)
                     {
                         //Manage source
                         if (tempEntry.entryType == iniEntry.EntryType.StaticData)
                         {
-                            tempEntry.source = "\\" + Path.GetExtension(tempEntry.filepath).Remove(0, 1) + "\\" + Path.GetFileName(tempEntry.filepath);
-
-                            string tempSource = "\\" + Path.GetExtension(tempEntry.filepath).Remove(0, 1) + "\\" + Path.GetFileName(tempEntry.filepath);
-                            int i = 1;
-
-                            while (EntryExists(tempEntry, dataSources))
+                            if (Path.HasExtension(tempEntry.filepath))
                             {
-                                tempEntry.source = tempSource.Insert(tempSource.LastIndexOf('.'), (++i).ToString());
-                            }
+                                tempEntry.source = "\\" + Path.GetExtension(tempEntry.filepath).Remove(0, 1) + "\\" + Path.GetFileName(tempEntry.filepath);
 
-                            FileInfo fi = new FileInfo(tempEntry.filepath);
-                            dataSources.Add(new string[] { tempEntry.source, fi.Length.ToString() });
+                                string tempSource = "\\" + Path.GetExtension(tempEntry.filepath).Remove(0, 1) + "\\" + Path.GetFileName(tempEntry.filepath);
+                                int i = 1;
+
+                                while (EntryExists(tempEntry, dataSources))
+                                {
+                                    tempEntry.source = tempSource.Insert(tempSource.LastIndexOf('.'), (++i).ToString());
+                                }
+
+                                FileInfo fi = new FileInfo(tempEntry.filepath);
+                                dataSources.Add(new string[] { tempEntry.source, fi.Length.ToString() });
+                            }
+                            else
+                            {
+                                tempEntry.source = "\\" + Path.GetFileName(tempEntry.filepath);
+
+                                string tempSource = "\\" + "\\" + Path.GetFileName(tempEntry.filepath);
+                                int i = 1;
+
+                                while (EntryExists(tempEntry, dataSources))
+                                {
+                                    tempEntry.source = tempSource.Insert(tempSource.LastIndexOf('.'), (++i).ToString());
+                                }
+
+                                FileInfo fi = new FileInfo(tempEntry.filepath);
+                                dataSources.Add(new string[] { tempEntry.source, fi.Length.ToString() });
+                            }
                         }
                         else if (tempEntry.entryType == iniEntry.EntryType.StaticImage)
                         {
@@ -564,6 +568,7 @@ namespace ThemeMii
             if (tempEntries.Count < 1)
             {
                 ErrorBox("No entries left...");
+                SetControls(true);
                 return;
             }
 

@@ -142,5 +142,77 @@ namespace ThemeMii.Properties {
                 this["savePrompt"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
+        public global::System.Drawing.Point windowLocation {
+            get {
+                return ((global::System.Drawing.Point)(this["windowLocation"]));
+            }
+            set {
+                this["windowLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
+        public global::System.Drawing.Size windowSize {
+            get {
+                return ((global::System.Drawing.Size)(this["windowSize"]));
+            }
+            set {
+                this["windowSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool windowMaximized {
+            get {
+                return ((bool)(this["windowMaximized"]));
+            }
+            set {
+                this["windowMaximized"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string nandBackupPath {
+            get {
+                return ((string)(this["nandBackupPath"]));
+            }
+            set {
+                this["nandBackupPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool saveNandPath {
+            get {
+                return ((bool)(this["saveNandPath"]));
+            }
+            set {
+                this["saveNandPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool imageSizeFromTpl {
+            get {
+                return ((bool)(this["imageSizeFromTpl"]));
+            }
+            set {
+                this["imageSizeFromTpl"] = value;
+            }
+        }
     }
 }

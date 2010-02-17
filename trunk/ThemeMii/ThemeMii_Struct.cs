@@ -26,6 +26,10 @@ namespace ThemeMii
         public bool keepExtractedApp;
         public bool lz77Containers;
         public bool savePrompt;
+        public string nandBackupPath;
+        public bool saveNandPath;
+        public bool saveWindowChanges;
+        public bool imageSizeFromTpl;
     }
 
     public struct AppBrowseInfo

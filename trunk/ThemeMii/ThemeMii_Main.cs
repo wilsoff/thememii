@@ -24,7 +24,7 @@ namespace ThemeMii
 {
     public partial class ThemeMii_Main : Form
     {
-        public const string version = "0.2";
+        public const string version = "0.3";
         private mymini ini;
         private string tempDir;
         private string appOut;
@@ -49,7 +49,6 @@ namespace ThemeMii
             updateThread.Start();
 
             this.Text = this.Text.Replace("X", version);
-            CenterToScreen();
             Initialize();
             LoadSettings();
         }
@@ -398,6 +397,12 @@ namespace ThemeMii
                 tbCustomImageWidth.Enabled = false;
                 tbCustomImageHeight.Enabled = false;
 
+                if (msImageSizeFromTpl.Checked)
+                {
+                    msImageSizeFromTpl.Checked = false;
+                    settings.imageSizeFromTpl = false;
+                }
+
                 MessageBox.Show("Be sure that your PNG images have the same size as the original TPLs they will replace," +
                                 " else you might get a brick!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
@@ -640,43 +645,123 @@ namespace ThemeMii
         private void msHelp_Click(object sender, EventArgs e)
         {
             ThemeMii_Help help = new ThemeMii_Help();
-            help.ShowDialog();
+            help.Show();
         }
 
         private void msInstallToNandBackup_Click(object sender, EventArgs e)
         {
             if (lbxIniEntries.Items.Count > 0 && pbProgress.Value == 100)
             {
-                FolderBrowserDialog fbd = new FolderBrowserDialog();
-                fbd.Description = "Choose the drive or directory where the 8 folders of the NAND backup are (ticket, title, shared1, ...)";
 
-                if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                string sysMenuPath = settings.nandBackupPath + "\\title\\00000001\\00000002\\content\\";
+
+                if (!Directory.Exists(sysMenuPath) || !settings.saveNandPath)
                 {
-                    string sysMenuPath = fbd.SelectedPath + "\\title\\00000001\\00000002\\content\\";
+                    FolderBrowserDialog fbd = new FolderBrowserDialog();
+                    fbd.Description = "Choose the drive or directory where the 8 folders of the NAND backup are (ticket, title, shared1, ...)";
+
+                    if (fbd.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+                    settings.nandBackupPath = fbd.SelectedPath;
+                    sysMenuPath = fbd.SelectedPath + "\\title\\00000001\\00000002\\content\\";
 
                     if (!Directory.Exists(sysMenuPath))
                     { ErrorBox("Directory wasn't found:\n" + sysMenuPath); return; }
-                    if (!File.Exists(sysMenuPath + "title.tmd"))
-                    { ErrorBox("File wasn't found:\n" + sysMenuPath + "title.tmd"); return; }
-
-                    BaseApp bApp = GetBaseAppFromTitleVersion(Wii.WadInfo.GetTitleVersion(sysMenuPath + "title.tmd"));
-
-                    if ((int)bApp == 0)
-                    { ErrorBox("Incompatible System Menu found. You must either have 3.2, 4.0, 4.1 or 4.2 (J/U/E)!"); return; }
-
-                    string baseAppFile = sysMenuPath + ((int)bApp).ToString("x8") + ".app";
-
-                    if (!File.Exists(baseAppFile))
-                    { ErrorBox("Base app file wasn't found:\n" + baseAppFile); return; }
-
-                    CreateCsm(baseAppFile, baseAppFile);
                 }
+
+                if (!File.Exists(sysMenuPath + "title.tmd"))
+                { ErrorBox("File wasn't found:\n" + sysMenuPath + "title.tmd"); return; }
+
+                BaseApp bApp = GetBaseAppFromTitleVersion(Wii.WadInfo.GetTitleVersion(sysMenuPath + "title.tmd"));
+
+                if ((int)bApp == 0)
+                { ErrorBox("Incompatible System Menu found. You must either have 3.2, 4.0, 4.1 or 4.2 (J/U/E)!"); return; }
+
+                string baseAppFile = sysMenuPath + ((int)bApp).ToString("x8") + ".app";
+
+                if (!File.Exists(baseAppFile))
+                { ErrorBox("Base app file wasn't found:\n" + baseAppFile); return; }
+
+                CreateCsm(baseAppFile, baseAppFile);
             }
         }
 
         private void msSavePrompt_Click(object sender, EventArgs e)
         {
             settings.savePrompt = msSavePrompt.Checked;
+        }
+
+        private void ThemeMii_Main_LocationChanged(object sender, EventArgs e)
+        {
+            if (settings.saveWindowChanges && this.WindowState != FormWindowState.Maximized)
+                Properties.Settings.Default.windowLocation = this.Location;
+        }
+
+        private void ThemeMii_Main_ResizeEnd(object sender, EventArgs e)
+        {
+            if (settings.saveWindowChanges)
+            {
+                Properties.Settings.Default.windowLocation = this.Location;
+                Properties.Settings.Default.windowSize = this.Size;
+            }
+        }
+
+        private void msSaveNandPath_Click(object sender, EventArgs e)
+        {
+            settings.saveNandPath = msSaveNandPath.Checked;
+            msChangeNandPath.Visible = msSaveNandPath.Checked;
+        }
+
+        private void msChangeNandPath_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.Description = "Choose the drive or directory where the 8 folders of the NAND backup are (ticket, title, shared1, ...)";
+            fbd.SelectedPath = settings.nandBackupPath;
+
+            if (fbd.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+            settings.nandBackupPath = fbd.SelectedPath;
+        }
+
+        private void ThemeMii_Main_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop) && pbProgress.Value == 100)
+            {
+                string[] drop = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                if (drop.Length == 1 && drop[0].ToLower().EndsWith(".mym"))
+                    e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void ThemeMii_Main_DragDrop(object sender, DragEventArgs e)
+        {
+            if (pbProgress.Value == 100)
+            {
+                string[] drop = (string[])e.Data.GetData(DataFormats.FileDrop);
+                Initialize();
+
+                Thread workThread = new Thread(new ParameterizedThreadStart(this._loadMym));
+                workThread.Start(drop[0]);
+            }
+        }
+
+        private void msHealthTutorial_Click(object sender, EventArgs e)
+        {
+            ThemeMii_Help help = new ThemeMii_Help();
+            help.Tutorial = true;
+            help.Show();
+        }
+
+        private void msImageSizeFromTpl_Click(object sender, EventArgs e)
+        {
+            settings.imageSizeFromTpl = msImageSizeFromTpl.Checked;
+
+            if (msImageSizeFromPng.Checked)
+            {
+                msImageSizeFromPng.Checked = false;
+                msImageSizeFromPng_Click(null, null);
+            }
         }
     }
 }

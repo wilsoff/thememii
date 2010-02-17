@@ -60,6 +60,20 @@ namespace ThemeMii.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\deflang1031{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
+        ///{\*\generator Msftedit 5.41.21.2509;}\viewkind4\uc1\pard\sa200\sl276\slmult1\qc\lang7\ul\b\f0\fs22 Health Screen Tutorial\par
+        ///\par
+        ///\pard\sa200\sl276\slmult1\ulnone\b0 This is a simple tutorial for ThemeMii on how to make a custom health screen. It&apos;s very short and simple, but hopefully you will know how ThemeMii works when you&apos;re finished.\par
+        ///First get yourself two custom health screen images:\par
+        ///- The health screen itse [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string HealthTut {
+            get {
+                return ResourceManager.GetString("HealthTut", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Icon ThemeMii_Icon {
             get {
                 object obj = ResourceManager.GetObject("ThemeMii_Icon", resourceCulture);

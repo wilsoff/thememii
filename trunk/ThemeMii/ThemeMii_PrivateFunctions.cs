@@ -113,7 +113,14 @@ namespace ThemeMii
             foreach (Control thisControl in parentCtrl.Controls)
             {
                 if (thisControl is Button) ((Button)thisControl).Enabled = state;
-                else if (thisControl is TextBox) ((TextBox)thisControl).Enabled = state;
+                else if (thisControl is TextBox)
+                {
+                    TextBox tb = (TextBox)thisControl;
+                    if (tb.Name.ToLower().Contains("source") && settings.sourceManage) continue;
+                    else if ((tb.Name.ToLower().Contains("width") || tb.Name.ToLower().Contains("height")) && settings.autoImageSize) continue;
+
+                    tb.Enabled = state;
+                }
 
                 if (thisControl.Controls.Count > 0) SetControlsRecursive(thisControl, state);
             }
@@ -144,6 +151,23 @@ namespace ThemeMii
             msImageSizeFromPng.Checked = settings.autoImageSize;
             settings.ignoreMissing = Properties.Settings.Default.ignoreMissing;
             msIgnoreMissingEntries.Checked = settings.ignoreMissing;
+            settings.imageSizeFromTpl = Properties.Settings.Default.imageSizeFromTpl;
+            msImageSizeFromTpl.Checked = settings.imageSizeFromTpl;
+
+            settings.saveNandPath = Properties.Settings.Default.saveNandPath;
+            msSaveNandPath.Checked = settings.saveNandPath;
+            msChangeNandPath.Visible = settings.saveNandPath;
+            settings.nandBackupPath = Properties.Settings.Default.nandBackupPath;
+
+
+
+            if (!Properties.Settings.Default.firstRun)
+            {
+                this.Size = Properties.Settings.Default.windowSize;
+                this.Location = Properties.Settings.Default.windowLocation;
+                this.WindowState = (Properties.Settings.Default.windowMaximized) ? FormWindowState.Maximized : FormWindowState.Normal;
+            }
+            else CenterToScreen();
 
             lastExtracted = (BaseApp)Properties.Settings.Default.lastExtracted;
 
@@ -174,6 +198,8 @@ namespace ThemeMii
                 tbCustomImageWidth.Enabled = false;
                 tbCustomImageHeight.Enabled = false;
             }
+
+            settings.saveWindowChanges = true;
         }
 
         private void SaveSettings()
@@ -186,6 +212,11 @@ namespace ThemeMii
             Properties.Settings.Default.sourceManage = settings.sourceManage;
             Properties.Settings.Default.autoImageSize = settings.autoImageSize;
             Properties.Settings.Default.ignoreMissing = settings.ignoreMissing;
+            Properties.Settings.Default.saveNandPath = settings.saveNandPath;
+            Properties.Settings.Default.nandBackupPath = settings.nandBackupPath;
+            Properties.Settings.Default.imageSizeFromTpl = settings.imageSizeFromTpl;
+
+            Properties.Settings.Default.windowMaximized = this.WindowState == FormWindowState.Maximized;
 
             Properties.Settings.Default.lastExtracted = (int)lastExtracted;
 
@@ -415,6 +446,7 @@ namespace ThemeMii
             iniEntry newEntry = new iniEntry();
             newEntry.entryType = entryType;
             newEntry.entry = type + newIndex.ToString() + "]";
+            newEntry.format = iniEntry.TplFormat.RGB5A3;
 
             ini.EntryList.Add(newEntry);
             lbxIniEntries.Items.Add(newEntry.entry);
@@ -543,8 +575,11 @@ namespace ThemeMii
             {
                 if (string.IsNullOrEmpty(entry.file) || entry.file.Length < 2)
                 { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
-                if (string.IsNullOrEmpty(entry.source))
-                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"source\"...", entry.entry)); return false; }
+                if (!settings.sourceManage)
+                {
+                    if (string.IsNullOrEmpty(entry.source))
+                    { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"source\"...", entry.entry)); return false; }
+                }
 
                 if (!File.Exists(entry.filepath))
                 { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nFile not found...\n\n{1}", entry.entry, entry.filepath)); return false; }
@@ -560,8 +595,11 @@ namespace ThemeMii
             {
                 if (string.IsNullOrEmpty(entry.file) || entry.file.Length < 2)
                 { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"file\"...", entry.entry)); return false; }
-                if (string.IsNullOrEmpty(entry.source))
-                { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"source\"...", entry.entry)); return false; }
+                if (!settings.sourceManage)
+                {
+                    if (string.IsNullOrEmpty(entry.source))
+                    { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nInvalid argument \"source\"...", entry.entry)); return false; }
+                }
 
                 if (!File.Exists(entry.filepath))
                 { if (!settings.ignoreMissing) ErrorBox(string.Format("Entry: {0}\nFile not found...\n\n{1}", entry.entry, entry.filepath)); return false; }
@@ -718,9 +756,37 @@ namespace ThemeMii
             if (appBrowser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 if (panStaticData.Visible) tbStaticDataFile.Text = appBrowser.SelectedPath;
-                else if (panStaticImage.Visible) tbStaticImageFile.Text = appBrowser.SelectedPath;
+                else if (panStaticImage.Visible)
+                {
+                    tbStaticImageFile.Text = appBrowser.SelectedPath;
+
+                    if (settings.imageSizeFromTpl)
+                    {
+                        try
+                        {
+                            byte[] tempTpl = Wii.Tools.LoadFileToByteArray(appBrowser.FullPath, 0, 500);
+                            tbStaticImageWidth.Text = Wii.TPL.GetTextureWidth(tempTpl).ToString();
+                            tbStaticImageHeight.Text = Wii.TPL.GetTextureHeight(tempTpl).ToString();
+                        }
+                        catch { }
+                    }
+                }
                 else if (panCustomData.Visible) tbCustomDataFile.Text = appBrowser.SelectedPath;
-                else if (panCustomImage.Visible) tbCustomImageFile.Text = appBrowser.SelectedPath;
+                else if (panCustomImage.Visible)
+                {
+                    tbCustomImageFile.Text = appBrowser.SelectedPath;
+
+                    if (settings.imageSizeFromTpl)
+                    {
+                        try
+                        {
+                            byte[] tempTpl = Wii.Tools.LoadFileToByteArray(appBrowser.FullPath, 0, 500);
+                            tbCustomImageWidth.Text = Wii.TPL.GetTextureWidth(tempTpl).ToString();
+                            tbCustomImageHeight.Text = Wii.TPL.GetTextureHeight(tempTpl).ToString();
+                        }
+                        catch { }
+                    }
+                }
                 else if (panContainer.Visible) tbContainerFile.Text = appBrowser.SelectedPath;
             }
         }
