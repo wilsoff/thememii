@@ -352,7 +352,7 @@ namespace ThemeMii
                                 Image img = Image.FromFile(ofd.FileName);
                                 img = ResizeImage(img, tempEntry.width, tempEntry.height);
 
-                                File.Delete(appOut + tempEntry.file);
+                                if (File.Exists(appOut + tempEntry.file)) File.Delete(appOut + tempEntry.file);
                                 Wii.TPL.ConvertToTPL(img, appOut + tempEntry.file, (int)tempEntry.format);
                             }
                         }
@@ -368,7 +368,7 @@ namespace ThemeMii
                 {
                     try
                     {
-                        if (File.Exists(mymOut + tempEntry.source) && File.Exists(appOut + tempEntry.file))
+                        if (File.Exists(mymOut + tempEntry.source))
                         {
                             Image img = Image.FromFile(mymOut + tempEntry.source);
                             img = ResizeImage(img, tempEntry.width, tempEntry.height);
@@ -410,7 +410,7 @@ namespace ThemeMii
                 {
                     try
                     {
-                        if (File.Exists(mymOut + tempEntry.source) && File.Exists(appOut + tempEntry.file))
+                        if (File.Exists(mymOut + tempEntry.source))
                         {
                             File.Copy(mymOut + tempEntry.source, appOut + tempEntry.file, true);
                         }

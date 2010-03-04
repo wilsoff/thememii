@@ -24,7 +24,7 @@ namespace ThemeMii
 {
     public partial class ThemeMii_Main : Form
     {
-        public const string version = "0.3";
+        public const string version = "0.4";
         private mymini ini;
         private string tempDir;
         private string appOut;
@@ -682,7 +682,20 @@ namespace ThemeMii
                 if (!File.Exists(baseAppFile))
                 { ErrorBox("Base app file wasn't found:\n" + baseAppFile); return; }
 
-                CreateCsm(baseAppFile, baseAppFile);
+                BaseApp standardApp = GetBaseApp();
+                string baseApp = Application.StartupPath + "\\" + ((int)standardApp).ToString("x8") + ".app";
+                if (!File.Exists(baseApp) || (int)standardApp == 0 || standardApp != bApp)
+                {
+                    OpenFileDialog ofd = new OpenFileDialog();
+                    if ((int)standardApp > 0) ofd.Title = "Standard System Menu base app wasn't found";
+                    ofd.Filter = "app|*.app";
+                    ofd.FileName = ((int)standardApp).ToString("x8") + ".app";
+
+                    if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK) baseApp = ofd.FileName;
+                    else return;
+                }
+
+                CreateCsm(baseApp, baseAppFile);
             }
         }
 

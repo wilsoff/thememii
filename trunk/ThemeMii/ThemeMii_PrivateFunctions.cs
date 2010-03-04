@@ -164,7 +164,11 @@ namespace ThemeMii
             if (!Properties.Settings.Default.firstRun)
             {
                 this.Size = Properties.Settings.Default.windowSize;
-                this.Location = Properties.Settings.Default.windowLocation;
+
+                if (Properties.Settings.Default.windowLocation.X < 1 &&
+                    Properties.Settings.Default.windowLocation.Y < 0) CenterToScreen();
+                else this.Location = Properties.Settings.Default.windowLocation;
+
                 this.WindowState = (Properties.Settings.Default.windowMaximized) ? FormWindowState.Maximized : FormWindowState.Normal;
             }
             else CenterToScreen();
