@@ -9,6 +9,10 @@ Please report bugs and make suggestions at the issue tracker there.
 Changelog:
 ----------
 
+Version 0.4
+	- Fixed bricking CSMs when contents doesn't exists in original app
+	- Fixed installing to nand backup
+
 Version 0.3
 	- Added a little tutorial on how to change the health screen (in the ?-menu)
 	- Added ability to drag a mym file onto the window to open it
